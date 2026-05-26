@@ -1,19 +1,58 @@
-// TODO: replace getMockResumes() with a mock of getResumes() once page.tsx restores getResumes()
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+
+vi.mock('@/app/actions', () => ({
+  getResumes: vi.fn(),
+  createResumeAction: vi.fn(),
+}));
+
+import { getResumes } from '@/app/actions';
 import Home from '@/app/page';
-import { getMockResumes } from '@/lib/resumes';
+
+const mockResumes = [
+  {
+    id: 1,
+    title: 'Senior Engineer CV',
+    targetRole: 'Staff Engineer',
+    targetCompany: 'Acme Corp',
+    createdAt: '2024-06-01T12:00:00.000Z',
+    templateId: 'default',
+    profileSummary: '',
+  },
+  {
+    id: 2,
+    title: 'Product Manager CV',
+    targetRole: 'Senior PM',
+    targetCompany: 'Beta Ltd',
+    createdAt: '2024-07-01T12:00:00.000Z',
+    templateId: 'default',
+    profileSummary: '',
+  },
+];
+
+beforeEach(() => {
+  vi.mocked(getResumes).mockReset();
+});
 
 describe('Home page', () => {
-  it('shows empty state when no resumes exist', async () => {
+  it('renders a link to the new resume page', async () => {
+    vi.mocked(getResumes).mockResolvedValue([]);
     render(await Home());
-    // TODO: force empty state by mocking getResumes([]) once it is restored in page.tsx
-    expect(screen.queryByText(/no resumes yet/i)).toBeDefined();
+    const link = screen.getByTestId('new-resume');
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', '/resumes/new');
+  });
+
+  it('shows empty state when no resumes exist', async () => {
+    vi.mocked(getResumes).mockResolvedValue([]);
+    render(await Home());
+    expect(screen.getByText(/no resumes yet/i)).toBeInTheDocument();
   });
 
   it('renders one card per resume', async () => {
+    vi.mocked(getResumes).mockResolvedValue(mockResumes);
     const { container } = render(await Home());
     const cards = container.querySelectorAll('[data-slot="card"]');
-    expect(cards).toHaveLength(getMockResumes().length);
+    expect(cards).toHaveLength(mockResumes.length);
   });
 });

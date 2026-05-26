@@ -63,36 +63,3 @@ export function listResumes(db: Database.Database): Resume[] {
     .prepare('SELECT * FROM resumes ORDER BY created_at DESC')
     .all() as DbResume[]).map(toResume);
 }
-
-// TODO: remove once real data is wired up via getResumes()
-export function getMockResumes(): Resume[] {
-  return [
-    {
-      id: 1,
-      title: 'Senior Frontend Engineer',
-      targetRole: 'Senior Frontend Engineer',
-      targetCompany: 'Acme Corp',
-      createdAt: '2026-05-20T10:00:00.000Z',
-      templateId: 'default',
-      profileSummary: 'Experienced frontend engineer with 7 years building React apps.',
-    },
-    {
-      id: 2,
-      title: 'Full Stack Developer',
-      targetRole: 'Full Stack Developer',
-      targetCompany: 'Startup Inc',
-      createdAt: '2026-05-18T09:30:00.000Z',
-      templateId: 'default',
-      profileSummary: 'Full stack developer focused on TypeScript and Node.js.',
-    },
-    {
-      id: 3,
-      title: 'Engineering Manager',
-      targetRole: 'Engineering Manager',
-      targetCompany: 'Big Tech Co',
-      createdAt: '2026-05-15T14:00:00.000Z',
-      templateId: 'default',
-      profileSummary: 'People-first engineering leader with a background in distributed systems.',
-    },
-  ];
-}
