@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #02 — Resume creation
 
@@ -10,12 +10,12 @@ The default `template_id` should be assigned automatically (whichever template i
 
 ## Acceptance criteria
 
-- [ ] A "New Resume" affordance (button or similar) is visible on the home page
-- [ ] Clicking it opens a form/dialog with fields: title (required, must be unique), target role (required), target company (required)
-- [ ] Submitting the form calls a Server Action that inserts the resume into the database with a default `template_id`
-- [ ] On success, the user is redirected to `/resumes/[id]`
-- [ ] A duplicate title shows a validation error without crashing
-- [ ] The new resume appears on the home page if the user navigates back
+- [x] A "New Resume" affordance (button or similar) is visible on the home page
+- [x] Clicking it opens a form/dialog with fields: title (required, must be unique), target role (required), target company (required)
+- [x] Submitting the form calls a Server Action that inserts the resume into the database with a default `template_id`
+- [x] On success, the user is redirected to `/resumes/[id]`
+- [x] A duplicate title shows a validation error without crashing
+- [x] The new resume appears on the home page if the user navigates back
 
 ## Blocked by
 
