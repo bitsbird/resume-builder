@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #01 — Resume list (Home + DB foundation)
 
@@ -12,12 +12,12 @@ The home page is the entry point for the entire application. It must show an emp
 
 ## Acceptance criteria
 
-- [ ] SQLite database is initialised in a gitignored `data/` directory using `better-sqlite3` accessed through Next.js Server Actions
-- [ ] `resumes` table exists with columns: `id`, `title` (unique), `target_role`, `target_company`, `created_at`, `template_id`, `profile_summary`
-- [ ] Server Action returns all resumes ordered by `created_at` descending
-- [ ] Home page (`/`) displays a card for each resume showing title, target role, target company, and created date
-- [ ] Home page shows a clear empty state when no resumes exist
-- [ ] Vitest `@/*` alias resolves to the project root (no `./src` mismatch)
+- [x] SQLite database is initialised in a gitignored `data/` directory using `better-sqlite3` accessed through Next.js Server Actions
+- [x] `resumes` table exists with columns: `id`, `title` (unique), `target_role`, `target_company`, `created_at`, `template_id`, `profile_summary`
+- [x] Server Action returns all resumes ordered by `created_at` descending
+- [x] Home page (`/`) displays a card for each resume showing title, target role, target company, and created date
+- [x] Home page shows a clear empty state when no resumes exist
+- [x] Vitest `@/*` alias resolves to the project root (no `./src` mismatch)
 
 ## Blocked by
 
