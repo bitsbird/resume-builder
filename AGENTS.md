@@ -94,7 +94,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Quality checks
 
-- Run `pnpm lint`.
+- Run `pnpm lint` and fix all errors before considering a task done.
+- Run `npx tsc --noEmit` and fix all TypeScript errors before considering a task done.
 - Run `pnpm test`.
 - Run `pnpm build` before finishing larger changes.
 - Fix TypeScript errors instead of suppressing them.
