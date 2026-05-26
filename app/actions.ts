@@ -14,5 +14,5 @@ export async function createResumeAction(
 ): Promise<{ error: string } | void> {
   const result = createResume(getDb(), input);
   if ('error' in result) return { error: result.error };
-  redirect(`/resumes/${result.id}`);
+  redirect(`/`);
 }
