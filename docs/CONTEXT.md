@@ -5,6 +5,7 @@ A professional resume is a concise, structured document highlighting a job seeke
 **Fields:** `title` (unique), `target_role`, `target_company`, `created_at`, `template_id`, `profile_summary` (Markdown)
 
 **Composition:**
+
 - Profile Summary — per-resume free-form Markdown text
 - Skill Sections — per-resume ordered sections, each containing an ordered subset of Skills
 - Work Experiences — ordered subset of the job seeker's Work Experiences; each carries a selected subset of Accomplishments (max 5) with their own ordering

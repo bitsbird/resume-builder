@@ -1,6 +1,6 @@
 import Database from 'better-sqlite3';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 export function initDb(dbPath: string): Database.Database {
   const db = new Database(dbPath);

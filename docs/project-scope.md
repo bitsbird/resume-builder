@@ -23,20 +23,23 @@ A component-based resume builder enabling a single job seeker to generate resume
 ## Data model
 
 ### Shared entities (repository)
-| Entity | Owned by | Notes |
-|---|---|---|
-| Skill | Job seeker | 1–2 words, no inherent category |
-| Work Experience | Job seeker | employer, role, start_date, end_date, location, header (nullable) |
-| Accomplishment | Work Experience | Markdown, max 5 per WE per resume, linked across resumes |
-| Education | Job seeker | degree, institution, start_date, end_date; always fully included |
+
+| Entity          | Owned by        | Notes                                                             |
+| --------------- | --------------- | ----------------------------------------------------------------- |
+| Skill           | Job seeker      | 1–2 words, no inherent category                                   |
+| Work Experience | Job seeker      | employer, role, start_date, end_date, location, header (nullable) |
+| Accomplishment  | Work Experience | Markdown, max 5 per WE per resume, linked across resumes          |
+| Education       | Job seeker      | degree, institution, start_date, end_date; always fully included  |
 
 ### Per-resume entities
-| Entity | Notes |
-|---|---|
-| Resume | title (unique), target_role, target_company, created_at, template_id, profile_summary (Markdown) |
-| Skill Section | title + ordered subset of Skills; position stored on join table |
+
+| Entity        | Notes                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------ |
+| Resume        | title (unique), target_role, target_company, created_at, template_id, profile_summary (Markdown) |
+| Skill Section | title + ordered subset of Skills; position stored on join table                                  |
 
 ### Key join tables
+
 - `resume_work_experiences` — resume ↔ work experience, with `position`
 - `resume_work_experience_accomplishments` — selects up to 5 accomplishments per WE per resume, with `position`
 - `skill_sections` — per-resume, with `position`

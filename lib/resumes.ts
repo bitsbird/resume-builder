@@ -47,7 +47,9 @@ export function createResume(
   }
   try {
     const result = db
-      .prepare('INSERT INTO resumes (title, target_role, target_company, template_id) VALUES (?, ?, ?, ?)')
+      .prepare(
+        'INSERT INTO resumes (title, target_role, target_company, template_id) VALUES (?, ?, ?, ?)',
+      )
       .run(input.title, input.targetRole, input.targetCompany, 'default');
     return { id: result.lastInsertRowid as number };
   } catch (e: unknown) {
@@ -59,7 +61,7 @@ export function createResume(
 }
 
 export function listResumes(db: Database.Database): Resume[] {
-  return (db
-    .prepare('SELECT * FROM resumes ORDER BY created_at DESC')
-    .all() as DbResume[]).map(toResume);
+  return (db.prepare('SELECT * FROM resumes ORDER BY created_at DESC').all() as DbResume[]).map(
+    toResume,
+  );
 }

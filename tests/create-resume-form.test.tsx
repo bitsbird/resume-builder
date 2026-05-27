@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { CreateResumeForm } from '@/app/_components/create-resume-form';
+import { createResumeAction } from '@/app/actions';
 
 vi.mock('@/app/actions', () => ({ createResumeAction: vi.fn() }));
-
-import { createResumeAction } from '@/app/actions';
-import { CreateResumeForm } from '@/app/_components/create-resume-form';
 
 beforeEach(() => {
   vi.mocked(createResumeAction).mockReset();
@@ -33,7 +33,9 @@ describe('CreateResumeForm', () => {
 
   it('shows a server error when action returns a duplicate title error', async () => {
     const user = userEvent.setup();
-    vi.mocked(createResumeAction).mockResolvedValue({ error: 'A resume with this title already exists.' });
+    vi.mocked(createResumeAction).mockResolvedValue({
+      error: 'A resume with this title already exists.',
+    });
     render(<CreateResumeForm />);
     await fillAndSubmit(user);
     expect(screen.getByRole('alert')).toHaveTextContent('A resume with this title already exists.');

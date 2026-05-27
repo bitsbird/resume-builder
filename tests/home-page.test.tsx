@@ -1,13 +1,13 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { getResumes } from '@/app/actions';
+import Home from '@/app/page';
 
 vi.mock('@/app/actions', () => ({
   getResumes: vi.fn(),
   createResumeAction: vi.fn(),
 }));
-
-import { getResumes } from '@/app/actions';
-import Home from '@/app/page';
 
 const mockResumes = [
   {

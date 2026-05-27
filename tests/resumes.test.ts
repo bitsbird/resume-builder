@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import type Database from 'better-sqlite3';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { initDb } from '@/lib/db';
-import { listResumes, createResume } from '@/lib/resumes';
+import { createResume, listResumes } from '@/lib/resumes';
 
 let db: Database.Database;
 
@@ -27,7 +28,11 @@ describe('createResume', () => {
   });
 
   it('returns an error when title is a duplicate', () => {
-    const input = { title: 'Senior Engineer CV', targetRole: 'Staff Engineer', targetCompany: 'Acme Corp' };
+    const input = {
+      title: 'Senior Engineer CV',
+      targetRole: 'Staff Engineer',
+      targetCompany: 'Acme Corp',
+    };
     createResume(db, input);
     const result = createResume(db, input);
     expect(result).toMatchObject({ error: expect.any(String) });
@@ -42,7 +47,7 @@ describe('listResumes', () => {
 
   it('returns resumes ordered newest first', () => {
     db.prepare(
-      `INSERT INTO resumes (title, created_at) VALUES ('Resume Jan 2024', '2024-01-01 00:00:00'), ('Resume Jun 2024', '2024-06-01 00:00:00')`
+      `INSERT INTO resumes (title, created_at) VALUES ('Resume Jan 2024', '2024-01-01 00:00:00'), ('Resume Jun 2024', '2024-06-01 00:00:00')`,
     ).run();
     const results = listResumes(db);
     expect(results[0].title).toBe('Resume Jun 2024');

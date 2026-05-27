@@ -1,17 +1,20 @@
 import Link from 'next/link';
+
+import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
 
 export const dynamic = 'force-dynamic';
-import { ResumeCard } from '@/app/_components/resume-card';
 
 export default async function Home() {
   const resumes = await getResumes();
 
   return (
     <main className="p-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">My Resumes</h1>
-        <Link href="/resumes/new" data-testid="new-resume">New Resume</Link>
+        <Link href="/resumes/new" data-testid="new-resume">
+          New Resume
+        </Link>
       </div>
       {resumes.length === 0 ? (
         <p className="text-muted-foreground">No resumes yet.</p>

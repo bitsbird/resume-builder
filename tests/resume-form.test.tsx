@@ -1,8 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { Resume } from '@/lib/resumes';
+import { describe, expect, it, vi } from 'vitest';
+
 import { ResumeForm } from '@/app/_components/resume-form';
+import type { Resume } from '@/lib/resumes';
 
 const fullResume: Partial<Resume> = {
   title: 'Senior Engineer CV',
@@ -45,7 +46,14 @@ describe('ResumeForm', () => {
   });
 
   it('displays the error prop when provided', () => {
-    render(<ResumeForm resume={{}} onChange={vi.fn()} onSubmit={vi.fn()} error="Title already exists." />);
+    render(
+      <ResumeForm
+        resume={{}}
+        onChange={vi.fn()}
+        onSubmit={vi.fn()}
+        error="Title already exists."
+      />,
+    );
     expect(screen.getByRole('alert')).toHaveTextContent('Title already exists.');
   });
 });

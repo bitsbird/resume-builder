@@ -1,9 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-
-vi.mock('@/app/actions', () => ({ createResumeAction: vi.fn() }));
+import { describe, expect, it, vi } from 'vitest';
 
 import NewResumePage from '@/app/resumes/new/page';
+
+vi.mock('@/app/actions', () => ({ createResumeAction: vi.fn() }));
 
 describe('/resumes/new page', () => {
   it('renders the form and the preview', () => {

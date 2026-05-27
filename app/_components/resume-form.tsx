@@ -11,12 +11,16 @@ interface ResumeFormProps {
 
 export function ResumeForm({ resume, onChange, onSubmit, error }: ResumeFormProps) {
   const isValid =
-    !!resume.title?.trim() &&
-    !!resume.targetRole?.trim() &&
-    !!resume.targetCompany?.trim();
+    !!resume.title?.trim() && !!resume.targetRole?.trim() && !!resume.targetCompany?.trim();
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }} className="flex flex-col gap-4">
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      className="flex flex-col gap-4"
+    >
       <div className="flex flex-col gap-1">
         <label htmlFor="title">Title *</label>
         <input

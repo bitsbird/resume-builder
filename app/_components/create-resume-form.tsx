@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import type { Resume } from '@/lib/resumes';
-import { createResumeAction } from '@/app/actions';
+
 import { ResumeForm } from '@/app/_components/resume-form';
 import { ResumePreview } from '@/app/_components/resume-preview';
+import { createResumeAction } from '@/app/actions';
+import type { Resume } from '@/lib/resumes';
 
 export function CreateResumeForm() {
   const [resume, setResume] = useState<Partial<Resume>>({});
@@ -21,7 +22,7 @@ export function CreateResumeForm() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-8 h-full">
+    <div className="grid h-full grid-cols-2 gap-8">
       <ResumeForm resume={resume} onChange={setResume} onSubmit={handleSubmit} error={error} />
       <ResumePreview resume={resume} />
     </div>
