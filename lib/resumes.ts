@@ -65,3 +65,8 @@ export function listResumes(db: Database.Database): Resume[] {
     toResume,
   );
 }
+
+export function getResume(db: Database.Database, id: number): Resume | null {
+  const row = db.prepare('SELECT * FROM resumes WHERE id = ?').get(id) as DbResume | undefined;
+  return row ? toResume(row) : null;
+}

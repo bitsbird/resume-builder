@@ -2,7 +2,7 @@ import type Database from 'better-sqlite3';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { initDb } from '@/lib/db';
-import { createResume, listResumes } from '@/lib/resumes';
+import { createResume, getResume, listResumes } from '@/lib/resumes';
 
 let db: Database.Database;
 
@@ -52,5 +52,32 @@ describe('listResumes', () => {
     const results = listResumes(db);
     expect(results[0].title).toBe('Resume Jun 2024');
     expect(results[1].title).toBe('Resume Jan 2024');
+  });
+});
+
+describe('getResume', () => {
+  it('fetches a resume by id and returns all fields', () => {
+    const created = createResume(db, {
+      title: 'Senior Engineer CV',
+      targetRole: 'Staff Engineer',
+      targetCompany: 'Acme Corp',
+    });
+    expect(created).toMatchObject({ id: expect.any(Number) });
+
+    const resume = getResume(db, (created as { id: number }).id);
+    expect(resume).toMatchObject({
+      id: expect.any(Number),
+      title: 'Senior Engineer CV',
+      targetRole: 'Staff Engineer',
+      targetCompany: 'Acme Corp',
+      createdAt: expect.any(String),
+      templateId: 'default',
+      profileSummary: '',
+    });
+  });
+
+  it('returns null when resume does not exist', () => {
+    const resume = getResume(db, 999);
+    expect(resume).toBeNull();
   });
 });
