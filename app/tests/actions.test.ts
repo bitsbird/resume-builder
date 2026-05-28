@@ -88,14 +88,14 @@ describe('createResumeWithDataAction', () => {
 
   it('links existing work experiences', async () => {
     // pre-create a WE
-    db.prepare('INSERT INTO work_experiences (employer, role, start_date, end_date, location, header) VALUES (?, ?, ?, ?, ?, ?)').run('Existing Co', 'Dev', '2019-01', null, 'LA', null);
+    db.prepare('INSERT INTO work_experiences (employer, role, start_date, end_date, location, header) VALUES (?, ?, ?, ?, ?, ?)').run('Existing Co', 'Dev', '2019-01', '2022-06', 'LA', 'Frontend team');
     const existingWeId = (db.prepare('SELECT id FROM work_experiences').get() as { id: number }).id;
 
     await createResumeWithDataAction({
       title: 'My Resume',
       targetRole: 'Engineer',
       targetCompany: 'Acme',
-      workExperiences: [{ type: 'existing', id: existingWeId }],
+      workExperiences: [{ type: 'existing', id: existingWeId, data: { employer: 'Existing Co', role: 'Dev', startDate: '2019-01', endDate: '2022-06', location: 'LA', header: 'Frontend team' } }],
     });
 
     const resumes = listResumes(db);
@@ -177,7 +177,7 @@ describe('updateResumeWithDataAction', () => {
       resumeId,
       ...baseFields,
       workExperiences: [
-        { type: 'new', data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: null, location: 'Remote', header: null } },
+        { type: 'new', data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' } },
       ],
     });
 
@@ -186,13 +186,37 @@ describe('updateResumeWithDataAction', () => {
     await updateResumeWithDataAction({
       resumeId,
       ...baseFields,
-      workExperiences: [{ type: 'existing', id: weId }],
+      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' } }],
     });
 
     const wes = getWorkExperiencesForResume(db, resumeId);
     expect(wes).toHaveLength(1);
     expect(wes[0].id).toBe(weId);
     expect(listAllWorkExperiences(db)).toHaveLength(1);
+  });
+
+  it('updates the data of an existing WE when saved with modified fields', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [
+        { type: 'new', data: { employer: 'Old Co', role: 'Junior Dev', startDate: '2025-01', endDate: '2025-06', location: 'Remote', header: 'Initial header' } },
+      ],
+    });
+
+    const weId = getWorkExperiencesForResume(db, resumeId)[0].id;
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Old Co', role: 'Senior Dev', startDate: '2025-02', endDate: '2025-12', location: 'NYC', header: 'Updated header' } }],
+    });
+
+    const wes = getWorkExperiencesForResume(db, resumeId);
+    expect(wes).toHaveLength(1);
+    expect(wes[0]).toMatchObject({ role: 'Senior Dev', startDate: '2025-02', endDate: '2025-12', location: 'NYC', header: 'Updated header' });
   });
 
   it('deletes orphaned WEs removed from the list', async () => {

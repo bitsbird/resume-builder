@@ -53,6 +53,18 @@ export function createWorkExperience(
   return { id: result.lastInsertRowid as number };
 }
 
+export function updateWorkExperience(
+  db: Database.Database,
+  id: number,
+  input: CreateWorkExperienceInput,
+): void {
+  db
+    .prepare(
+      'UPDATE work_experiences SET employer = ?, role = ?, start_date = ?, end_date = ?, location = ?, header = ? WHERE id = ?',
+    )
+    .run(input.employer, input.role, input.startDate, input.endDate, input.location, input.header, id);
+}
+
 export function listAllWorkExperiences(db: Database.Database): WorkExperience[] {
   return (
     db.prepare('SELECT * FROM work_experiences').all() as DbWorkExperience[]

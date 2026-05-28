@@ -10,6 +10,7 @@ import {
   listAllWorkExperiences,
   removeWorkExperienceFromResume,
   reorderWorkExperience,
+  updateWorkExperience,
 } from '@/lib/work-experiences';
 
 let db: Database.Database;
@@ -48,6 +49,32 @@ describe('createWorkExperience', () => {
     const we = all.find((w) => w.id === id);
     expect(we?.endDate).toBeNull();
     expect(we?.header).toBeNull();
+  });
+});
+
+describe('updateWorkExperience', () => {
+  it('updates all fields of an existing work experience', () => {
+    const { id } = createWorkExperience(db, weInput) as { id: number };
+
+    updateWorkExperience(db, id, {
+      employer: 'New Corp',
+      role: 'Lead Engineer',
+      startDate: '2021-06',
+      endDate: '2024-12',
+      location: 'NYC',
+      header: 'Platform team',
+    });
+
+    const all = listAllWorkExperiences(db);
+    expect(all[0]).toMatchObject({
+      id,
+      employer: 'New Corp',
+      role: 'Lead Engineer',
+      startDate: '2021-06',
+      endDate: '2024-12',
+      location: 'NYC',
+      header: 'Platform team',
+    });
   });
 });
 

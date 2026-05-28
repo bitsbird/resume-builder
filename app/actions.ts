@@ -10,6 +10,7 @@ import {
   createWorkExperience,
   listAllWorkExperiences,
   removeWorkExperienceFromResume,
+  updateWorkExperience,
 } from '@/lib/work-experiences';
 import type { CreateWorkExperienceInput, WorkExperience } from '@/lib/work-experiences';
 
@@ -31,7 +32,7 @@ export async function createResumeAction(
 
 type WorkExperienceEntry =
   | { type: 'new'; data: CreateWorkExperienceInput }
-  | { type: 'existing'; id: number };
+  | { type: 'existing'; id: number; data: CreateWorkExperienceInput };
 
 export type CreateResumeWithDataInput = {
   title: string;
@@ -80,11 +81,10 @@ export async function updateResumeWithDataAction(
   const resumeError = updateResume(db, resumeId, { title, targetRole, targetCompany });
   if (resumeError) return resumeError;
 
-  const keptIds = new Set(
-    workExperiences
-      .filter((we): we is { type: 'existing'; id: number } => we.type === 'existing')
-      .map((we) => we.id),
+  const existingEntries = workExperiences.filter(
+    (we): we is Extract<WorkExperienceEntry, { type: 'existing' }> => we.type === 'existing',
   );
+  const keptIds = new Set(existingEntries.map((we) => we.id));
 
   const currentLinks = db
     .prepare('SELECT we_id FROM resume_work_experiences WHERE resume_id = ?')
@@ -93,6 +93,8 @@ export async function updateResumeWithDataAction(
   currentLinks
     .filter(({ we_id }) => !keptIds.has(we_id))
     .forEach(({ we_id }) => removeWorkExperienceFromResume(db, resumeId, we_id));
+
+  existingEntries.forEach((we) => updateWorkExperience(db, we.id, we.data));
 
   // Remove all remaining links so we can re-insert in correct order
   db.prepare('DELETE FROM resume_work_experiences WHERE resume_id = ?').run(resumeId);
