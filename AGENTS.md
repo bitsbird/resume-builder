@@ -87,7 +87,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Testing
 
 - Write Vitest tests for utilities, hooks, and react components.
-- use a `tests/` folder consistently.
+- Place tests in a `tests/` folder colocated next to the file under test. For example: `app/_components/resume-card.tsx` → `app/_components/tests/resume-card.test.tsx`.
 - Mock server calls and browser APIs deliberately.
 
 ### Testing React components
