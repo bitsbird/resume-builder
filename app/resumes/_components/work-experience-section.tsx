@@ -6,7 +6,7 @@ import { listAllWorkExperiencesAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { generateId, swapItems } from '@/lib/utils';
 import type { CreateWorkExperienceInput, WorkExperience } from '@/lib/work-experiences';
-import type { EditorWorkExperience } from './editor-types';
+import type { EditorAccomplishment, EditorWorkExperience } from './editor-types';
 import { WorkExperienceItem } from './work-experience-item';
 import { WorkExperienceLookupDialog } from './work-experience-lookup-dialog';
 
@@ -37,13 +37,14 @@ export function WorkExperienceSection({ workExperiences, onChange }: WorkExperie
       type: 'new',
       localId: generateId(),
       data: { employer: '', role: '', startDate: '', endDate: null, location: '', header: null },
+      accomplishments: [],
     };
     onChange([...workExperiences, newWe]);
   }
 
   function addExisting(we: WorkExperience) {
     const { id, ...data } = we;
-    onChange([...workExperiences, { type: 'existing', localId: generateId(), id, data }]);
+    onChange([...workExperiences, { type: 'existing', localId: generateId(), id, data, accomplishments: [] }]);
   }
 
   function remove(localId: string) {
@@ -64,6 +65,17 @@ export function WorkExperienceSection({ workExperiences, onChange }: WorkExperie
     const idx = workExperiences.findIndex((we) => we.localId === localId);
     if (idx < 0 || idx >= workExperiences.length - 1) return;
     onChange(swapItems(workExperiences, idx, idx + 1));
+  }
+
+  function addAccomplishment(localId: string, content: string) {
+    const newAcc: EditorAccomplishment = { type: 'new', localId: generateId(), content };
+    onChange(
+      workExperiences.map((we) =>
+        we.localId === localId
+          ? { ...we, accomplishments: [...we.accomplishments, newAcc] }
+          : we,
+      ),
+    );
   }
 
   return (
@@ -94,6 +106,7 @@ export function WorkExperienceSection({ workExperiences, onChange }: WorkExperie
           onRemove={() => remove(we.localId)}
           onMoveUp={() => moveUp(we.localId)}
           onMoveDown={() => moveDown(we.localId)}
+          onAddAccomplishment={(content) => addAccomplishment(we.localId, content)}
         />
       ))}
 

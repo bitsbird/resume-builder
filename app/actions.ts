@@ -2,6 +2,10 @@
 
 import { redirect } from 'next/navigation';
 
+import {
+  createAccomplishment,
+  linkAccomplishmentToResumeWe,
+} from '@/lib/accomplishments';
 import { getDb } from '@/lib/db';
 import { createResume, listResumes, updateResume } from '@/lib/resumes';
 import type { CreateResumeInput, Resume } from '@/lib/resumes';
@@ -30,9 +34,13 @@ export async function createResumeAction(
   redirect(`/resumes/${result.id}`);
 }
 
+type AccomplishmentEntry =
+  | { type: 'new'; content: string }
+  | { type: 'existing'; id: number; content: string };
+
 type WorkExperienceEntry =
-  | { type: 'new'; data: CreateWorkExperienceInput }
-  | { type: 'existing'; id: number; data: CreateWorkExperienceInput };
+  | { type: 'new'; data: CreateWorkExperienceInput; accomplishments: AccomplishmentEntry[] }
+  | { type: 'existing'; id: number; data: CreateWorkExperienceInput; accomplishments: AccomplishmentEntry[] };
 
 export type CreateResumeWithDataInput = {
   title: string;
@@ -40,6 +48,18 @@ export type CreateResumeWithDataInput = {
   targetCompany: string;
   workExperiences: WorkExperienceEntry[];
 };
+
+function linkAccomplishments(
+  db: ReturnType<typeof getDb>,
+  resumeId: number,
+  weId: number,
+  accomplishments: AccomplishmentEntry[],
+): void {
+  accomplishments.forEach((acc) => {
+    const accId = acc.type === 'new' ? createAccomplishment(db, { weId, content: acc.content }).id : acc.id;
+    linkAccomplishmentToResumeWe(db, resumeId, weId, accId);
+  });
+}
 
 export async function createResumeWithDataAction(
   input: CreateResumeWithDataInput,
@@ -56,10 +76,15 @@ export async function createResumeWithDataAction(
 
   const resumeId = resumeResult.id;
 
-  input.workExperiences.forEach((we) => {
-    const weId = we.type === 'new' ? createWorkExperience(db, we.data).id : we.id;
-    addWorkExperienceToResume(db, resumeId, weId);
-  });
+  try {
+    input.workExperiences.forEach((we) => {
+      const weId = we.type === 'new' ? createWorkExperience(db, we.data).id : we.id;
+      addWorkExperienceToResume(db, resumeId, weId);
+      linkAccomplishments(db, resumeId, weId, we.accomplishments);
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Failed to save accomplishments' };
+  }
 
   redirect(`/resumes/${resumeId}`);
 }
@@ -99,10 +124,15 @@ export async function updateResumeWithDataAction(
   // Remove all remaining links so we can re-insert in correct order
   db.prepare('DELETE FROM resume_work_experiences WHERE resume_id = ?').run(resumeId);
 
-  workExperiences.forEach((we) => {
-    const weId = we.type === 'new' ? createWorkExperience(db, we.data).id : we.id;
-    addWorkExperienceToResume(db, resumeId, weId);
-  });
+  try {
+    workExperiences.forEach((we) => {
+      const weId = we.type === 'new' ? createWorkExperience(db, we.data).id : we.id;
+      addWorkExperienceToResume(db, resumeId, weId);
+      linkAccomplishments(db, resumeId, weId, we.accomplishments);
+    });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Failed to save accomplishments' };
+  }
 
   redirect(`/resumes/${resumeId}`);
 }

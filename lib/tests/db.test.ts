@@ -37,4 +37,22 @@ describe('initDb', () => {
     const names = cols.map((c) => c.name);
     expect(names).toEqual(expect.arrayContaining(['resume_id', 'we_id', 'position']));
   });
+
+  it('creates an accomplishments table with the required columns', () => {
+    const db = initDb(':memory:');
+    const cols = db.prepare("PRAGMA table_info('accomplishments')").all() as { name: string }[];
+    const names = cols.map((c) => c.name);
+    expect(names).toEqual(expect.arrayContaining(['id', 'we_id', 'content']));
+  });
+
+  it('creates a resume_work_experience_accomplishments join table with the required columns', () => {
+    const db = initDb(':memory:');
+    const cols = db
+      .prepare("PRAGMA table_info('resume_work_experience_accomplishments')")
+      .all() as { name: string }[];
+    const names = cols.map((c) => c.name);
+    expect(names).toEqual(
+      expect.arrayContaining(['resume_id', 'we_id', 'accomplishment_id', 'position']),
+    );
+  });
 });

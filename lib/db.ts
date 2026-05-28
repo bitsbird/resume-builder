@@ -31,6 +31,20 @@ export function initDb(dbPath: string): Database.Database {
       position  INTEGER NOT NULL,
       PRIMARY KEY (resume_id, we_id)
     );
+
+    CREATE TABLE IF NOT EXISTS accomplishments (
+      id      INTEGER PRIMARY KEY AUTOINCREMENT,
+      we_id   INTEGER NOT NULL REFERENCES work_experiences(id),
+      content TEXT    NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS resume_work_experience_accomplishments (
+      resume_id         INTEGER NOT NULL REFERENCES resumes(id),
+      we_id             INTEGER NOT NULL REFERENCES work_experiences(id),
+      accomplishment_id INTEGER NOT NULL REFERENCES accomplishments(id),
+      position          INTEGER NOT NULL,
+      PRIMARY KEY (resume_id, we_id, accomplishment_id)
+    );
   `);
   return db;
 }

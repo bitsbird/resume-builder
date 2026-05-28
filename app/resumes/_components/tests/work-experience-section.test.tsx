@@ -32,6 +32,7 @@ const editorWe: EditorWorkExperience = {
     location: existingWe.location,
     header: existingWe.header,
   },
+  accomplishments: [],
 };
 
 beforeEach(() => {
@@ -93,6 +94,25 @@ describe('WorkExperienceSection', () => {
     fireEvent.click(await screen.findByTestId('we-lookup-add'));
     expect(onChange).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ type: 'existing', id: existingWe.id })]),
+    );
+  });
+
+  it('appends a new accomplishment to the correct WE when onAddAccomplishment fires', () => {
+    const onChange = vi.fn();
+    render(<WorkExperienceSection workExperiences={[editorWe]} onChange={onChange} />);
+    fireEvent.change(screen.getByTestId('accomplishment-input'), {
+      target: { value: 'Shipped feature X' },
+    });
+    fireEvent.click(screen.getByTestId('accomplishment-add'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          localId: editorWe.localId,
+          accomplishments: expect.arrayContaining([
+            expect.objectContaining({ type: 'new', content: 'Shipped feature X' }),
+          ]),
+        }),
+      ]),
     );
   });
 });

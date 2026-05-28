@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +16,7 @@ interface WorkExperienceItemProps {
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  onAddAccomplishment: (content: string) => void;
 }
 
 export function WorkExperienceItem({
@@ -24,11 +27,19 @@ export function WorkExperienceItem({
   onRemove,
   onMoveUp,
   onMoveDown,
+  onAddAccomplishment,
 }: WorkExperienceItemProps) {
   const data = we.data;
+  const [accomplishmentDraft, setAccomplishmentDraft] = useState('');
 
   function update(patch: Partial<CreateWorkExperienceInput>) {
     onChange({ ...data, ...patch });
+  }
+
+  function handleAddAccomplishment() {
+    if (!accomplishmentDraft.trim()) return;
+    onAddAccomplishment(accomplishmentDraft.trim());
+    setAccomplishmentDraft('');
   }
 
   return (
@@ -116,6 +127,34 @@ export function WorkExperienceItem({
             placeholder="Optional section header"
           />
         </div>
+      </div>
+
+      {we.accomplishments.length > 0 && (
+        <ul className="flex flex-col gap-1">
+          {we.accomplishments.map((acc) => (
+            <li key={acc.localId} data-testid="accomplishment-item" className="text-sm">
+              {acc.content}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div className="flex gap-2">
+        <Input
+          data-testid="accomplishment-input"
+          value={accomplishmentDraft}
+          onChange={(e) => setAccomplishmentDraft(e.target.value)}
+          placeholder="Add accomplishment"
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          data-testid="accomplishment-add"
+          onClick={handleAddAccomplishment}
+        >
+          Add
+        </Button>
       </div>
     </div>
   );

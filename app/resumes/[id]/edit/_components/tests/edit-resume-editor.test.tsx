@@ -39,6 +39,7 @@ const newWorkExperience: EditorWorkExperience = {
     location: 'Remote',
     header: 'Backend focus',
   },
+  accomplishments: [],
 };
 
 const existingWorkExperience: EditorWorkExperience = {
@@ -53,6 +54,7 @@ const existingWorkExperience: EditorWorkExperience = {
     location: 'Remote',
     header: 'Backend focus',
   },
+  accomplishments: [],
 };
 
 beforeEach(() => {
@@ -85,7 +87,7 @@ describe('EditResumeEditor', () => {
       title: 'Updated CV',
       targetRole: 'Principal Engineer',
       targetCompany: 'Globex Corp',
-      workExperiences: [{ type: 'new', data: newWorkExperience.data }],
+      workExperiences: [{ type: 'new', data: newWorkExperience.data, accomplishments: [] }],
     });
   });
 
@@ -117,6 +119,7 @@ describe('EditResumeEditor', () => {
         location: 'NYC',
         header: 'Platform team',
       },
+      accomplishments: [],
     };
 
     render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} />);
@@ -130,7 +133,7 @@ describe('EditResumeEditor', () => {
       title: mockResume.title,
       targetRole: mockResume.targetRole,
       targetCompany: mockResume.targetCompany,
-      workExperiences: [{ type: 'new', data: modifiedWorkExperience.data }],
+      workExperiences: [{ type: 'new', data: modifiedWorkExperience.data, accomplishments: [] }],
     });
   });
 });

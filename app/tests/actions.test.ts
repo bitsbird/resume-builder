@@ -6,6 +6,7 @@ import { createResumeAction, createResumeWithDataAction, updateResumeWithDataAct
 import { initDb } from '@/lib/db';
 import { getDb } from '@/lib/db';
 import { getWorkExperiencesForResume, listAllWorkExperiences } from '@/lib/work-experiences';
+import { getAccomplishmentsForResumeWe } from '@/lib/accomplishments';
 import { listResumes } from '@/lib/resumes';
 
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
@@ -73,8 +74,8 @@ describe('createResumeWithDataAction', () => {
       targetRole: 'Engineer',
       targetCompany: 'Acme',
       workExperiences: [
-        { type: 'new', data: { employer: 'Acme', role: 'Eng', startDate: '2020-01', endDate: null, location: 'Remote', header: null } },
-        { type: 'new', data: { employer: 'Beta', role: 'PM', startDate: '2022-01', endDate: '2023-01', location: 'NYC', header: null } },
+        { type: 'new', data: { employer: 'Acme', role: 'Eng', startDate: '2020-01', endDate: null, location: 'Remote', header: null }, accomplishments: [] },
+        { type: 'new', data: { employer: 'Beta', role: 'PM', startDate: '2022-01', endDate: '2023-01', location: 'NYC', header: null }, accomplishments: [] },
       ],
     });
 
@@ -95,7 +96,7 @@ describe('createResumeWithDataAction', () => {
       title: 'My Resume',
       targetRole: 'Engineer',
       targetCompany: 'Acme',
-      workExperiences: [{ type: 'existing', id: existingWeId, data: { employer: 'Existing Co', role: 'Dev', startDate: '2019-01', endDate: '2022-06', location: 'LA', header: 'Frontend team' } }],
+      workExperiences: [{ type: 'existing', id: existingWeId, data: { employer: 'Existing Co', role: 'Dev', startDate: '2019-01', endDate: '2022-06', location: 'LA', header: 'Frontend team' }, accomplishments: [] }],
     });
 
     const resumes = listResumes(db);
@@ -161,7 +162,7 @@ describe('updateResumeWithDataAction', () => {
       resumeId,
       ...baseFields,
       workExperiences: [
-        { type: 'new', data: { employer: 'New Co', role: 'Lead', startDate: '2023-01', endDate: null, location: 'SF', header: null } },
+        { type: 'new', data: { employer: 'New Co', role: 'Lead', startDate: '2023-01', endDate: null, location: 'SF', header: null }, accomplishments: [] },
       ],
     });
 
@@ -177,7 +178,7 @@ describe('updateResumeWithDataAction', () => {
       resumeId,
       ...baseFields,
       workExperiences: [
-        { type: 'new', data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' } },
+        { type: 'new', data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' }, accomplishments: [] },
       ],
     });
 
@@ -186,7 +187,7 @@ describe('updateResumeWithDataAction', () => {
     await updateResumeWithDataAction({
       resumeId,
       ...baseFields,
-      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' } }],
+      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Kept Co', role: 'Dev', startDate: '2020-01', endDate: '2024-03', location: 'Remote', header: 'Platform team' }, accomplishments: [] }],
     });
 
     const wes = getWorkExperiencesForResume(db, resumeId);
@@ -202,7 +203,7 @@ describe('updateResumeWithDataAction', () => {
       resumeId,
       ...baseFields,
       workExperiences: [
-        { type: 'new', data: { employer: 'Old Co', role: 'Junior Dev', startDate: '2025-01', endDate: '2025-06', location: 'Remote', header: 'Initial header' } },
+        { type: 'new', data: { employer: 'Old Co', role: 'Junior Dev', startDate: '2025-01', endDate: '2025-06', location: 'Remote', header: 'Initial header' }, accomplishments: [] },
       ],
     });
 
@@ -211,7 +212,7 @@ describe('updateResumeWithDataAction', () => {
     await updateResumeWithDataAction({
       resumeId,
       ...baseFields,
-      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Old Co', role: 'Senior Dev', startDate: '2025-02', endDate: '2025-12', location: 'NYC', header: 'Updated header' } }],
+      workExperiences: [{ type: 'existing', id: weId, data: { employer: 'Old Co', role: 'Senior Dev', startDate: '2025-02', endDate: '2025-12', location: 'NYC', header: 'Updated header' }, accomplishments: [] }],
     });
 
     const wes = getWorkExperiencesForResume(db, resumeId);
@@ -226,7 +227,7 @@ describe('updateResumeWithDataAction', () => {
       resumeId,
       ...baseFields,
       workExperiences: [
-        { type: 'new', data: { employer: 'Gone Co', role: 'Dev', startDate: '2020-01', endDate: null, location: 'Remote', header: null } },
+        { type: 'new', data: { employer: 'Gone Co', role: 'Dev', startDate: '2020-01', endDate: null, location: 'Remote', header: null }, accomplishments: [] },
       ],
     });
 
@@ -243,5 +244,55 @@ describe('updateResumeWithDataAction', () => {
     await updateResumeWithDataAction({ resumeId, ...baseFields, workExperiences: [] });
 
     expect(redirect).toHaveBeenCalledWith(`/resumes/${resumeId}`);
+  });
+
+  it('creates and links new accomplishments for a work experience', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [
+        {
+          type: 'new',
+          data: { employer: 'Acme', role: 'Eng', startDate: '2020-01', endDate: null, location: 'Remote', header: null },
+          accomplishments: [
+            { type: 'new', content: 'Shipped feature X' },
+            { type: 'new', content: 'Reduced latency by 40%' },
+          ],
+        },
+      ],
+    });
+
+    const wes = getWorkExperiencesForResume(db, resumeId);
+    const accs = getAccomplishmentsForResumeWe(db, resumeId, wes[0].id);
+    expect(accs).toHaveLength(2);
+    expect(accs[0]).toMatchObject({ weId: wes[0].id, content: 'Shipped feature X' });
+    expect(accs[1]).toMatchObject({ weId: wes[0].id, content: 'Reduced latency by 40%' });
+  });
+
+  it('enforces max-5-per-WE and returns an error when exceeded', async () => {
+    const resumeId = await seedResume();
+
+    const result = await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [
+        {
+          type: 'new',
+          data: { employer: 'Acme', role: 'Eng', startDate: '2020-01', endDate: null, location: 'Remote', header: null },
+          accomplishments: [
+            { type: 'new', content: 'One' },
+            { type: 'new', content: 'Two' },
+            { type: 'new', content: 'Three' },
+            { type: 'new', content: 'Four' },
+            { type: 'new', content: 'Five' },
+            { type: 'new', content: 'Six' },
+          ],
+        },
+      ],
+    });
+
+    expect(result).toMatchObject({ error: expect.any(String) });
   });
 });

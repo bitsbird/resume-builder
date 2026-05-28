@@ -26,7 +26,7 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
 
   const initialWorkExperiences: EditorWorkExperience[] = resume.workExperiences.map((we) => {
     const { id, ...data } = we;
-    return { type: 'existing', localId: generateId(), id, data };
+    return { type: 'existing', localId: generateId(), id, data, accomplishments: [] };
   });
 
   return (

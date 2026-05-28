@@ -16,6 +16,10 @@ const fullWe: EditorWorkExperience = {
     location: 'Remote',
     header: 'Engineering',
   },
+  accomplishments: [
+    { type: 'existing', localId: 'acc-1', id: 101, content: 'Shipped feature X' },
+    { type: 'existing', localId: 'acc-2', id: 102, content: 'Reduced latency by 40%' },
+  ],
 };
 
 const minimalWe: EditorWorkExperience = {
@@ -29,6 +33,7 @@ const minimalWe: EditorWorkExperience = {
     location: '',
     header: null,
   },
+  accomplishments: [],
 };
 
 describe('WorkExperienceItem', () => {
@@ -42,6 +47,7 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
 
@@ -63,6 +69,7 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     expect(screen.getByTestId('we-item')).toBeInTheDocument();
@@ -78,6 +85,7 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     expect(screen.getByTestId('we-move-up')).toBeDisabled();
@@ -93,6 +101,7 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     expect(screen.getByTestId('we-move-down')).toBeDisabled();
@@ -109,6 +118,7 @@ describe('WorkExperienceItem', () => {
         onRemove={onRemove}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     fireEvent.click(screen.getByTestId('we-remove'));
@@ -126,6 +136,7 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={onMoveUp}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     fireEvent.click(screen.getByTestId('we-move-up'));
@@ -143,9 +154,83 @@ describe('WorkExperienceItem', () => {
         onRemove={vi.fn()}
         onMoveUp={vi.fn()}
         onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
       />,
     );
     fireEvent.change(screen.getByDisplayValue('Acme Corp'), { target: { value: 'Beta Inc' } });
     expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ employer: 'Beta Inc' }));
+  });
+
+  it('renders the accomplishments list when accomplishments are present', () => {
+    render(
+      <WorkExperienceItem
+        we={fullWe}
+        isFirst={false}
+        isLast={false}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
+      />,
+    );
+    expect(screen.getByText('Shipped feature X')).toBeInTheDocument();
+    expect(screen.getByText('Reduced latency by 40%')).toBeInTheDocument();
+  });
+
+  it('renders no accomplishment items when the list is empty', () => {
+    render(
+      <WorkExperienceItem
+        we={minimalWe}
+        isFirst={true}
+        isLast={true}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
+      />,
+    );
+    expect(screen.queryAllByTestId('accomplishment-item')).toHaveLength(0);
+  });
+
+  it('calls onAddAccomplishment with the typed content when the add button is clicked', () => {
+    const onAddAccomplishment = vi.fn();
+    render(
+      <WorkExperienceItem
+        we={minimalWe}
+        isFirst={true}
+        isLast={true}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={onAddAccomplishment}
+      />,
+    );
+    fireEvent.change(screen.getByTestId('accomplishment-input'), {
+      target: { value: 'Launched new product' },
+    });
+    fireEvent.click(screen.getByTestId('accomplishment-add'));
+    expect(onAddAccomplishment).toHaveBeenCalledWith('Launched new product');
+  });
+
+  it('clears the input after adding an accomplishment', () => {
+    render(
+      <WorkExperienceItem
+        we={minimalWe}
+        isFirst={true}
+        isLast={true}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
+      />,
+    );
+    const input = screen.getByTestId('accomplishment-input');
+    fireEvent.change(input, { target: { value: 'Something great' } });
+    fireEvent.click(screen.getByTestId('accomplishment-add'));
+    expect(input).toHaveValue('');
   });
 });
