@@ -1,11 +1,11 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { getResume } from '@/lib/resumes';
+import { getResumeWithData } from '@/lib/resumes';
 import ResumePage from '@/app/resumes/[id]/page';
 
 vi.mock('@/lib/resumes', () => ({
-  getResume: vi.fn(),
+  getResumeWithData: vi.fn(),
 }));
 
 const mockResume = {
@@ -16,50 +16,35 @@ const mockResume = {
   createdAt: '2024-06-01T12:00:00.000Z',
   templateId: 'default',
   profileSummary: 'Experienced engineer.',
+  workExperiences: [],
 };
 
 beforeEach(() => {
-  vi.mocked(getResume).mockReset();
+  vi.mocked(getResumeWithData).mockReset();
 });
 
 describe('/resumes/[id] page', () => {
-  it('renders the split view layout with editor and preview panels', async () => {
-    vi.mocked(getResume).mockReturnValue(mockResume);
-    const { container } = render(
-      await ResumePage({
-        params: Promise.resolve({ id: '1' }),
-      }),
-    );
-
-    expect(container.querySelector('[data-slot="split-view"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-slot="editor-panel"]')).toBeInTheDocument();
-    expect(container.querySelector('[data-slot="preview-panel"]')).toBeInTheDocument();
+  it('renders resume title and target role in the preview', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue(mockResume);
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByText('Senior Engineer CV')).toBeInTheDocument();
+    expect(screen.getByText('Staff Engineer')).toBeInTheDocument();
   });
 
-  it('displays resume title, target role, and target company in editor', async () => {
-    vi.mocked(getResume).mockReturnValue(mockResume);
-    const { container } = render(
-      await ResumePage({
-        params: Promise.resolve({ id: '1' }),
-      }),
-    );
-
-    const editorPanel = container.querySelector('[data-slot="editor-panel"]');
-    expect(editorPanel?.textContent).toContain('Senior Engineer CV');
-    expect(editorPanel?.textContent).toContain('Staff Engineer');
-    expect(editorPanel?.textContent).toContain('Acme Corp');
+  it('renders an Edit link pointing to the edit route', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue(mockResume);
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByTestId('resume-edit-link')).toHaveAttribute('href', '/resumes/1/edit');
   });
 
-  it('renders preview panel on the right with resume data', async () => {
-    vi.mocked(getResume).mockReturnValue(mockResume);
-    const { container } = render(
-      await ResumePage({
-        params: Promise.resolve({ id: '1' }),
-      }),
-    );
-
-    const previewPanel = container.querySelector('[data-slot="preview-panel"]');
-    expect(previewPanel?.textContent).toContain('Senior Engineer CV');
-    expect(previewPanel?.textContent).toContain('default');
+  it('renders work experiences in the preview', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({
+      ...mockResume,
+      workExperiences: [
+        { id: 1, employer: 'Beta Industries', role: 'Engineer', startDate: '2020-01', endDate: null, location: 'Remote', header: null },
+      ],
+    });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByText('Beta Industries')).toBeInTheDocument();
   });
 });

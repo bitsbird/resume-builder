@@ -2,7 +2,8 @@ import type Database from 'better-sqlite3';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { initDb } from '@/lib/db';
-import { createResume, getResume, listResumes } from '@/lib/resumes';
+import { createResume, getResume, getResumeWithData, listResumes, updateResume } from '@/lib/resumes';
+import { addWorkExperienceToResume, createWorkExperience } from '@/lib/work-experiences';
 
 let db: Database.Database;
 
@@ -79,5 +80,87 @@ describe('getResume', () => {
   it('returns null when resume does not exist', () => {
     const resume = getResume(db, 999);
     expect(resume).toBeNull();
+  });
+});
+
+describe('updateResume', () => {
+  it('updates title, targetRole and targetCompany', () => {
+    const { id } = createResume(db, {
+      title: 'Old Title',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+
+    updateResume(db, id, { title: 'New Title', targetRole: 'Lead', targetCompany: 'Beta' });
+
+    const resume = getResume(db, id);
+    expect(resume).toMatchObject({ title: 'New Title', targetRole: 'Lead', targetCompany: 'Beta' });
+  });
+
+  it('returns an error when the new title is empty', () => {
+    const { id } = createResume(db, {
+      title: 'My Resume',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+
+    const result = updateResume(db, id, { title: '', targetRole: 'Lead', targetCompany: 'Beta' });
+
+    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(getResume(db, id)?.title).toBe('My Resume');
+  });
+
+  it('returns an error when the new title is a duplicate of another resume', () => {
+    createResume(db, { title: 'Other Resume', targetRole: '', targetCompany: '' });
+    const { id } = createResume(db, {
+      title: 'My Resume',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+
+    const result = updateResume(db, id, {
+      title: 'Other Resume',
+      targetRole: 'Lead',
+      targetCompany: 'Beta',
+    });
+
+    expect(result).toMatchObject({ error: expect.any(String) });
+    expect(getResume(db, id)?.title).toBe('My Resume');
+  });
+});
+
+describe('getResumeWithData', () => {
+  it('returns the resume together with its work experiences', () => {
+    const { id: resumeId } = createResume(db, {
+      title: 'My Resume',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+    const { id: weId } = createWorkExperience(db, {
+      employer: 'Acme', role: 'Dev', startDate: '2020-01', endDate: null, location: 'Remote', header: null,
+    });
+    addWorkExperienceToResume(db, resumeId, weId);
+
+    const result = getResumeWithData(db, resumeId);
+
+    expect(result).toMatchObject({ id: resumeId, title: 'My Resume' });
+    expect(result?.workExperiences).toHaveLength(1);
+    expect(result?.workExperiences[0].employer).toBe('Acme');
+  });
+
+  it('returns null when the resume does not exist', () => {
+    expect(getResumeWithData(db, 999)).toBeNull();
+  });
+
+  it('returns the resume with an empty workExperiences array when none are linked', () => {
+    const { id: resumeId } = createResume(db, {
+      title: 'Empty Resume',
+      targetRole: '',
+      targetCompany: '',
+    }) as { id: number };
+
+    const result = getResumeWithData(db, resumeId);
+
+    expect(result?.workExperiences).toEqual([]);
   });
 });

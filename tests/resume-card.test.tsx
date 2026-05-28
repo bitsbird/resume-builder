@@ -34,6 +34,11 @@ describe('ResumeCard', () => {
     expect(screen.getByText(/2024/)).toBeInTheDocument();
   });
 
+  it('links to the resume detail page', () => {
+    render(<ResumeCard resume={fullResume} />);
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/resumes/1');
+  });
+
   it('renders only the card shell when all parameters are empty', () => {
     const { container } = render(<ResumeCard resume={minimalResume} />);
     expect(container.querySelector('[data-slot="card"]')).toBeInTheDocument();

@@ -19,4 +19,22 @@ describe('initDb', () => {
       ]),
     );
   });
+
+  it('creates a work_experiences table with the required columns', () => {
+    const db = initDb(':memory:');
+    const cols = db.prepare("PRAGMA table_info('work_experiences')").all() as { name: string }[];
+    const names = cols.map((c) => c.name);
+    expect(names).toEqual(
+      expect.arrayContaining(['id', 'employer', 'role', 'start_date', 'end_date', 'location', 'header']),
+    );
+  });
+
+  it('creates a resume_work_experiences join table with the required columns', () => {
+    const db = initDb(':memory:');
+    const cols = db
+      .prepare("PRAGMA table_info('resume_work_experiences')")
+      .all() as { name: string }[];
+    const names = cols.map((c) => c.name);
+    expect(names).toEqual(expect.arrayContaining(['resume_id', 'we_id', 'position']));
+  });
 });

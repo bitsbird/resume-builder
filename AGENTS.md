@@ -68,6 +68,11 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Prefer semantic HTML, accessible labels, and keyboard-friendly interactions.
 - Keep layouts responsive, mobile-first.
 
+## JavaScript style
+
+- Write eloquent JavaScript. Prefer expressive built-in array methods (`.with()`, `.toSorted()`, `.toSpliced()`, `.at()`, `.map()`, `.filter()`) over index manipulation and manual mutations.
+- Extract repeated or non-obvious patterns into named utility functions in `lib/utils.ts` so call sites read as intent, not mechanics.
+
 ## Component rules
 
 - Keep components small and single-purpose.

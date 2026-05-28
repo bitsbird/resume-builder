@@ -1,10 +1,9 @@
-import { CreateResumeForm } from '@/app/_components/create-resume-form';
+import { NewResumeEditor } from './_components/new-resume-editor';
 
 export default function NewResumePage() {
   return (
-    <main className="h-full p-8">
-      <h1 className="mb-6 text-2xl font-bold">New Resume</h1>
-      <CreateResumeForm />
+    <main className="h-full">
+      <NewResumeEditor />
     </main>
   );
 }

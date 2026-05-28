@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Resume } from '@/lib/resumes';
 
@@ -10,15 +12,17 @@ export function ResumeCard({ resume }: ResumeCardProps) {
   const formattedDate =
     parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.toLocaleDateString() : null;
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{resume.title}</CardTitle>
-      </CardHeader>
-      <CardContent className="text-muted-foreground space-y-1 text-sm">
-        {resume.targetRole && <p>{resume.targetRole}</p>}
-        {resume.targetCompany && <p>{resume.targetCompany}</p>}
-        {formattedDate && <p>{formattedDate}</p>}
-      </CardContent>
-    </Card>
+    <Link href={`/resumes/${resume.id}`}>
+      <Card className="hover:bg-accent transition-colors">
+        <CardHeader>
+          <CardTitle>{resume.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="text-muted-foreground space-y-1 text-sm">
+          {resume.targetRole && <p>{resume.targetRole}</p>}
+          {resume.targetCompany && <p>{resume.targetCompany}</p>}
+          {formattedDate && <p>{formattedDate}</p>}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

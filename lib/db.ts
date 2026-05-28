@@ -13,7 +13,24 @@ export function initDb(dbPath: string): Database.Database {
       created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
       template_id     TEXT    NOT NULL DEFAULT '',
       profile_summary TEXT    NOT NULL DEFAULT ''
-    )
+    );
+
+    CREATE TABLE IF NOT EXISTS work_experiences (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      employer   TEXT NOT NULL,
+      role       TEXT NOT NULL,
+      start_date TEXT NOT NULL,
+      end_date   TEXT,
+      location   TEXT NOT NULL,
+      header     TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS resume_work_experiences (
+      resume_id INTEGER NOT NULL REFERENCES resumes(id),
+      we_id     INTEGER NOT NULL REFERENCES work_experiences(id),
+      position  INTEGER NOT NULL,
+      PRIMARY KEY (resume_id, we_id)
+    );
   `);
   return db;
 }
