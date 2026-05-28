@@ -52,6 +52,15 @@ export default async function ResumePage({ params }: ResumPageProps) {
                   {we.startDate}
                   {we.endDate ? ` – ${we.endDate}` : ' – present'} · {we.location}
                 </p>
+                {we.accomplishments.length > 0 && (
+                  <ul className="mt-2 flex flex-col gap-1">
+                    {we.accomplishments.map((acc) => (
+                      <li key={acc.id} data-testid="we-accomplishment" className="text-sm">
+                        {acc.content}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
           </div>

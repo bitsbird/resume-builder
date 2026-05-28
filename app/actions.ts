@@ -5,10 +5,11 @@ import { redirect } from 'next/navigation';
 import {
   createAccomplishment,
   linkAccomplishmentToResumeWe,
+  listAccomplishmentsForWe,
 } from '@/lib/accomplishments';
 import { getDb } from '@/lib/db';
 import { createResume, listResumes, updateResume } from '@/lib/resumes';
-import type { CreateResumeInput, Resume } from '@/lib/resumes';
+import type { CreateResumeInput, Resume, WorkExperienceWithAccomplishments } from '@/lib/resumes';
 import {
   addWorkExperienceToResume,
   createWorkExperience,
@@ -16,14 +17,18 @@ import {
   removeWorkExperienceFromResume,
   updateWorkExperience,
 } from '@/lib/work-experiences';
-import type { CreateWorkExperienceInput, WorkExperience } from '@/lib/work-experiences';
+import type { CreateWorkExperienceInput } from '@/lib/work-experiences';
 
 export async function getResumes(): Promise<Resume[]> {
   return listResumes(getDb());
 }
 
-export async function listAllWorkExperiencesAction(): Promise<WorkExperience[]> {
-  return listAllWorkExperiences(getDb());
+export async function listAllWorkExperiencesAction(): Promise<WorkExperienceWithAccomplishments[]> {
+  const db = getDb();
+  return listAllWorkExperiences(db).map((we) => ({
+    ...we,
+    accomplishments: listAccomplishmentsForWe(db, we.id),
+  }));
 }
 
 export async function createResumeAction(

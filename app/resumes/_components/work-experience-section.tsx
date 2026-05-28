@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { listAllWorkExperiencesAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { generateId, swapItems } from '@/lib/utils';
-import type { CreateWorkExperienceInput, WorkExperience } from '@/lib/work-experiences';
+import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
+import type { CreateWorkExperienceInput } from '@/lib/work-experiences';
 import type { EditorAccomplishment, EditorWorkExperience } from './editor-types';
 import { WorkExperienceItem } from './work-experience-item';
 import { WorkExperienceLookupDialog } from './work-experience-lookup-dialog';
@@ -17,14 +18,14 @@ interface WorkExperienceSectionProps {
 
 export function WorkExperienceSection({ workExperiences, onChange }: WorkExperienceSectionProps) {
   const [isLookupOpen, setIsLookupOpen] = useState(false);
-  const [fetchedWorkExperiences, setFetchedWorkExperiences] = useState<WorkExperience[]>([]);
+  const [fetchedWorkExperiences, setFetchedWorkExperiences] = useState<WorkExperienceWithAccomplishments[]>([]);
 
   const linkedIds = new Set(
     workExperiences
       .filter((we): we is Extract<EditorWorkExperience, { type: 'existing' }> => we.type === 'existing')
       .map((we) => we.id),
   );
-  const available = fetchedWorkExperiences.filter((we) => !linkedIds.has(we.id));
+  const savedWorkExperiences = fetchedWorkExperiences.filter((we) => !linkedIds.has(we.id));
 
   async function openLookup() {
     const all = await listAllWorkExperiencesAction();
@@ -42,9 +43,15 @@ export function WorkExperienceSection({ workExperiences, onChange }: WorkExperie
     onChange([...workExperiences, newWe]);
   }
 
-  function addExisting(we: WorkExperience) {
-    const { id, ...data } = we;
-    onChange([...workExperiences, { type: 'existing', localId: generateId(), id, data, accomplishments: [] }]);
+  function addExisting(we: WorkExperienceWithAccomplishments) {
+    const { id, accomplishments, ...data } = we;
+    const editorAccomplishments: EditorAccomplishment[] = accomplishments.map((acc) => ({
+      type: 'existing',
+      localId: generateId(),
+      id: acc.id,
+      content: acc.content,
+    }));
+    onChange([...workExperiences, { type: 'existing', localId: generateId(), id, data, accomplishments: editorAccomplishments }]);
   }
 
   function remove(localId: string) {
@@ -112,7 +119,7 @@ export function WorkExperienceSection({ workExperiences, onChange }: WorkExperie
 
       <WorkExperienceLookupDialog
         isOpen={isLookupOpen}
-        available={available}
+        savedWorkExperiences={savedWorkExperiences}
         onAdd={addExisting}
         onClose={() => setIsLookupOpen(false)}
       />

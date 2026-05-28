@@ -2,11 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { WorkExperienceLookupDialog } from '@/app/resumes/_components/work-experience-lookup-dialog';
-import type { WorkExperience } from '@/lib/work-experiences';
+import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
 
-const available: WorkExperience[] = [
-  { id: 1, employer: 'Acme Corp', role: 'Engineer', startDate: '2020-01', endDate: '2023-06', location: 'Remote', header: null },
-  { id: 2, employer: 'Beta Inc', role: 'PM', startDate: '2019-03', endDate: null, location: 'NYC', header: 'Product' },
+const savedWorkExperiences: WorkExperienceWithAccomplishments[] = [
+  { id: 1, employer: 'Acme Corp', role: 'Engineer', startDate: '2020-01', endDate: '2023-06', location: 'Remote', header: null, accomplishments: [] },
+  { id: 2, employer: 'Beta Inc', role: 'PM', startDate: '2019-03', endDate: null, location: 'NYC', header: 'Product', accomplishments: [] },
 ];
 
 describe('WorkExperienceLookupDialog', () => {
@@ -14,7 +14,7 @@ describe('WorkExperienceLookupDialog', () => {
     render(
       <WorkExperienceLookupDialog
         isOpen={true}
-        available={available}
+        savedWorkExperiences={savedWorkExperiences}
         onAdd={vi.fn()}
         onClose={vi.fn()}
       />,
@@ -27,7 +27,7 @@ describe('WorkExperienceLookupDialog', () => {
     render(
       <WorkExperienceLookupDialog
         isOpen={true}
-        available={[]}
+        savedWorkExperiences={[]}
         onAdd={vi.fn()}
         onClose={vi.fn()}
       />,
@@ -40,13 +40,13 @@ describe('WorkExperienceLookupDialog', () => {
     render(
       <WorkExperienceLookupDialog
         isOpen={true}
-        available={available}
+        savedWorkExperiences={savedWorkExperiences}
         onAdd={onAdd}
         onClose={vi.fn()}
       />,
     );
     fireEvent.click(screen.getAllByTestId('we-lookup-add')[0]);
-    expect(onAdd).toHaveBeenCalledWith(available[0]);
+    expect(onAdd).toHaveBeenCalledWith(savedWorkExperiences[0]);
   });
 
   it('calls onClose when the close button is clicked', () => {
@@ -54,7 +54,7 @@ describe('WorkExperienceLookupDialog', () => {
     render(
       <WorkExperienceLookupDialog
         isOpen={true}
-        available={available}
+        savedWorkExperiences={savedWorkExperiences}
         onAdd={vi.fn()}
         onClose={onClose}
       />,

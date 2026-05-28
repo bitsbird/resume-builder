@@ -8,6 +8,7 @@ import {
   createAccomplishment,
   linkAccomplishmentToResumeWe,
   getAccomplishmentsForResumeWe,
+  listAccomplishmentsForWe,
 } from '@/lib/accomplishments';
 
 let db: Database.Database;
@@ -84,6 +85,24 @@ describe('linkAccomplishmentToResumeWe + getAccomplishmentsForResumeWe', () => {
   it('returns an empty array when no accomplishments are linked', () => {
     const { resumeId, weId } = seedResumeAndWe();
     expect(getAccomplishmentsForResumeWe(db, resumeId, weId)).toEqual([]);
+  });
+});
+
+describe('listAccomplishmentsForWe', () => {
+  it('returns all accomplishments created for a WE', () => {
+    const { weId } = seedResumeAndWe();
+    const { id: accId1 } = createAccomplishment(db, { weId, content: 'First' }) as { id: number };
+    const { id: accId2 } = createAccomplishment(db, { weId, content: 'Second' }) as { id: number };
+
+    const accs = listAccomplishmentsForWe(db, weId);
+    expect(accs).toHaveLength(2);
+    expect(accs[0]).toMatchObject({ id: accId1, weId, content: 'First' });
+    expect(accs[1]).toMatchObject({ id: accId2, weId, content: 'Second' });
+  });
+
+  it('returns an empty array when a WE has no accomplishments', () => {
+    const { weId } = seedResumeAndWe();
+    expect(listAccomplishmentsForWe(db, weId)).toEqual([]);
   });
 });
 

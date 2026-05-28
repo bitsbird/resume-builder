@@ -4,13 +4,13 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { WorkExperienceSection } from '@/app/resumes/_components/work-experience-section';
 import { listAllWorkExperiencesAction } from '@/app/actions';
 import type { EditorWorkExperience } from '@/app/resumes/_components/editor-types';
-import type { WorkExperience } from '@/lib/work-experiences';
+import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
 
 vi.mock('@/app/actions', () => ({
   listAllWorkExperiencesAction: vi.fn(),
 }));
 
-const existingWe: WorkExperience = {
+const existingWe: WorkExperienceWithAccomplishments = {
   id: 10,
   employer: 'Saved Co',
   role: 'Dev',
@@ -18,6 +18,7 @@ const existingWe: WorkExperience = {
   endDate: null,
   location: 'Remote',
   header: null,
+  accomplishments: [],
 };
 
 const editorWe: EditorWorkExperience = {
@@ -94,6 +95,29 @@ describe('WorkExperienceSection', () => {
     fireEvent.click(await screen.findByTestId('we-lookup-add'));
     expect(onChange).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ type: 'existing', id: existingWe.id })]),
+    );
+  });
+
+  it('pre-loads accomplishments when adding a WE from the lookup', async () => {
+    const weWithAccs: WorkExperienceWithAccomplishments = {
+      ...existingWe,
+      accomplishments: [{ id: 201, weId: existingWe.id, content: 'Shipped feature X' }],
+    };
+    vi.mocked(listAllWorkExperiencesAction).mockResolvedValue([weWithAccs]);
+    const onChange = vi.fn();
+    render(<WorkExperienceSection workExperiences={[]} onChange={onChange} />);
+    fireEvent.click(screen.getByTestId('we-lookup-trigger'));
+    fireEvent.click(await screen.findByTestId('we-lookup-add'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'existing',
+          id: existingWe.id,
+          accomplishments: expect.arrayContaining([
+            expect.objectContaining({ type: 'existing', id: 201, content: 'Shipped feature X' }),
+          ]),
+        }),
+      ]),
     );
   });
 

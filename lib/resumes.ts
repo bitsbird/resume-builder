@@ -1,5 +1,7 @@
 import type Database from 'better-sqlite3';
 
+import { getAccomplishmentsForResumeWe } from './accomplishments';
+import type { Accomplishment } from './accomplishments';
 import { getWorkExperiencesForResume } from './work-experiences';
 import type { WorkExperience } from './work-experiences';
 
@@ -74,13 +76,19 @@ export function getResume(db: Database.Database, id: number): Resume | null {
   return row ? toResume(row) : null;
 }
 
-export type ResumeWithData = Resume & { workExperiences: WorkExperience[] };
+export type WorkExperienceWithAccomplishments = WorkExperience & { accomplishments: Accomplishment[] };
+
+export type ResumeWithData = Resume & { workExperiences: WorkExperienceWithAccomplishments[] };
 
 export function getResumeWithData(db: Database.Database, id: number): ResumeWithData | null {
   return db.transaction(() => {
     const resume = getResume(db, id);
     if (!resume) return null;
-    return { ...resume, workExperiences: getWorkExperiencesForResume(db, id) };
+    const workExperiences = getWorkExperiencesForResume(db, id).map((we) => ({
+      ...we,
+      accomplishments: getAccomplishmentsForResumeWe(db, id, we.id),
+    }));
+    return { ...resume, workExperiences };
   })();
 }
 

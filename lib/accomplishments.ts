@@ -58,6 +58,17 @@ export function linkAccomplishmentToResumeWe(
   ).run(resumeId, weId, accomplishmentId, next_pos);
 }
 
+export function listAccomplishmentsForWe(
+  db: Database.Database,
+  weId: number,
+): Accomplishment[] {
+  return (
+    db
+      .prepare('SELECT * FROM accomplishments WHERE we_id = ? ORDER BY id ASC')
+      .all(weId) as DbAccomplishment[]
+  ).map(toAccomplishment);
+}
+
 export function getAccomplishmentsForResumeWe(
   db: Database.Database,
   resumeId: number,
