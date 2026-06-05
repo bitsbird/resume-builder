@@ -17,6 +17,7 @@ const mockResume = {
   templateId: 'default',
   profileSummary: 'Experienced engineer.',
   workExperiences: [],
+  skillSections: [],
 };
 
 beforeEach(() => {

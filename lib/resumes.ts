@@ -2,6 +2,8 @@ import type Database from 'better-sqlite3';
 
 import { getAccomplishmentsForResumeWe } from './accomplishments';
 import type { Accomplishment } from './accomplishments';
+import { getSkillSectionsForResume } from './skills';
+import type { SkillSectionWithSkills } from './skills';
 import { getWorkExperiencesForResume } from './work-experiences';
 import type { WorkExperience } from './work-experiences';
 
@@ -78,7 +80,10 @@ export function getResume(db: Database.Database, id: number): Resume | null {
 
 export type WorkExperienceWithAccomplishments = WorkExperience & { accomplishments: Accomplishment[] };
 
-export type ResumeWithData = Resume & { workExperiences: WorkExperienceWithAccomplishments[] };
+export type ResumeWithData = Resume & {
+  workExperiences: WorkExperienceWithAccomplishments[];
+  skillSections: SkillSectionWithSkills[];
+};
 
 export function getResumeWithData(db: Database.Database, id: number): ResumeWithData | null {
   return db.transaction(() => {
@@ -88,7 +93,8 @@ export function getResumeWithData(db: Database.Database, id: number): ResumeWith
       ...we,
       accomplishments: getAccomplishmentsForResumeWe(db, id, we.id),
     }));
-    return { ...resume, workExperiences };
+    const skillSections = getSkillSectionsForResume(db, id);
+    return { ...resume, workExperiences, skillSections };
   })();
 }
 

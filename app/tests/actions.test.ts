@@ -7,7 +7,8 @@ import { initDb } from '@/lib/db';
 import { getDb } from '@/lib/db';
 import { getWorkExperiencesForResume, listAllWorkExperiences } from '@/lib/work-experiences';
 import { getAccomplishmentsForResumeWe } from '@/lib/accomplishments';
-import { listResumes } from '@/lib/resumes';
+import { listResumes, getResumeWithData } from '@/lib/resumes';
+import { getSkillSectionsForResume } from '@/lib/skills';
 
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
 vi.mock('@/lib/db', async (importOriginal) => {
@@ -294,5 +295,93 @@ describe('updateResumeWithDataAction', () => {
     });
 
     expect(result).toMatchObject({ error: expect.any(String) });
+  });
+
+  it('creates new skill sections with their skills and returns them via getResumeWithData', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      skillSections: [
+        {
+          type: 'new',
+          title: 'Tech Skills',
+          skills: [
+            { type: 'new', name: 'React' },
+            { type: 'new', name: 'Node.js' },
+          ],
+        },
+        {
+          type: 'new',
+          title: 'Soft Skills',
+          skills: [{ type: 'new', name: 'Leadership' }],
+        },
+      ],
+    });
+
+    const sections = getSkillSectionsForResume(db, resumeId);
+    expect(sections).toHaveLength(2);
+    expect(sections[0]).toMatchObject({ resumeId, title: 'Tech Skills', position: 0 });
+    expect(sections[0].skills).toHaveLength(2);
+    expect(sections[0].skills[0]).toMatchObject({ name: 'React' });
+    expect(sections[0].skills[1]).toMatchObject({ name: 'Node.js' });
+    expect(sections[1]).toMatchObject({ resumeId, title: 'Soft Skills', position: 1 });
+    expect(sections[1].skills[0]).toMatchObject({ name: 'Leadership' });
+  });
+
+  it('preserves existing skill sections and keeps non-orphaned skills on re-save', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      skillSections: [
+        { type: 'new', title: 'Tech Skills', skills: [{ type: 'new', name: 'React' }] },
+      ],
+    });
+
+    const sectionsBefore = getSkillSectionsForResume(db, resumeId);
+    const sectionId = sectionsBefore[0].id;
+    const skillId = sectionsBefore[0].skills[0].id;
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      skillSections: [
+        {
+          type: 'existing',
+          id: sectionId,
+          title: 'Tech Skills',
+          skills: [{ type: 'existing', id: skillId, name: 'React' }],
+        },
+      ],
+    });
+
+    const sectionsAfter = getSkillSectionsForResume(db, resumeId);
+    expect(sectionsAfter).toHaveLength(1);
+    expect(sectionsAfter[0].id).toBe(sectionId);
+    expect(sectionsAfter[0].skills[0].id).toBe(skillId);
+  });
+
+  it('includes skill sections when reading resume via getResumeWithData', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      skillSections: [
+        { type: 'new', title: 'Tech Skills', skills: [{ type: 'new', name: 'TypeScript' }] },
+      ],
+    });
+
+    const resume = getResumeWithData(db, resumeId);
+    expect(resume?.skillSections).toHaveLength(1);
+    expect(resume?.skillSections[0]).toMatchObject({ title: 'Tech Skills' });
+    expect(resume?.skillSections[0].skills[0]).toMatchObject({ name: 'TypeScript' });
   });
 });

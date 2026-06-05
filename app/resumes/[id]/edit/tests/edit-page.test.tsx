@@ -9,7 +9,7 @@ vi.mock('@/lib/resumes', () => ({
 }));
 
 vi.mock('@/app/resumes/[id]/edit/_components/edit-resume-editor', () => ({
-  EditResumeEditor: ({ initialWorkExperiences }: { initialWorkExperiences: unknown[] }) => (
+  EditResumeEditor: ({ initialWorkExperiences }: { initialWorkExperiences: unknown[]; initialSkillSections: unknown[] }) => (
     <div data-testid="editor" data-we-count={initialWorkExperiences.length}>
       {JSON.stringify(initialWorkExperiences)}
     </div>
@@ -43,6 +43,7 @@ const mockResume = {
       ],
     },
   ],
+  skillSections: [],
 };
 
 beforeEach(() => {

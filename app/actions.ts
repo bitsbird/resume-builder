@@ -13,6 +13,13 @@ import { getDb } from '@/lib/db';
 import { createResume, listResumes, updateResume } from '@/lib/resumes';
 import type { CreateResumeInput, Resume, WorkExperienceWithAccomplishments } from '@/lib/resumes';
 import {
+  addSkillToSection,
+  createSkill,
+  createSkillSection,
+  deleteSkillSection,
+  getSkillSectionsForResume,
+} from '@/lib/skills';
+import {
   addWorkExperienceToResume,
   createWorkExperience,
   listAllWorkExperiences,
@@ -105,12 +112,21 @@ export async function createResumeWithDataAction(
   redirect(`/resumes/${resumeId}`);
 }
 
+type SkillEntry =
+  | { type: 'new'; name: string }
+  | { type: 'existing'; id: number; name: string };
+
+type SkillSectionEntry =
+  | { type: 'new'; title: string; skills: SkillEntry[] }
+  | { type: 'existing'; id: number; title: string; skills: SkillEntry[] };
+
 export type UpdateResumeWithDataInput = {
   resumeId: number;
   title: string;
   targetRole: string;
   targetCompany: string;
   workExperiences: WorkExperienceEntry[];
+  skillSections?: SkillSectionEntry[];
   accomplishmentsToDelete?: number[];
 };
 
@@ -155,6 +171,44 @@ export async function updateResumeWithDataAction(
   if (input.accomplishmentsToDelete && input.accomplishmentsToDelete.length > 0) {
     const placeholders = input.accomplishmentsToDelete.map(() => '?').join(',');
     db.prepare(`DELETE FROM accomplishments WHERE id IN (${placeholders})`).run(...input.accomplishmentsToDelete);
+  }
+
+  if (input.skillSections !== undefined) {
+    const currentSections = getSkillSectionsForResume(db, resumeId);
+    const keptSectionIds = new Set(
+      input.skillSections
+        .filter((s): s is Extract<SkillSectionEntry, { type: 'existing' }> => s.type === 'existing')
+        .map((s) => s.id),
+    );
+    currentSections
+      .filter((s) => !keptSectionIds.has(s.id))
+      .forEach((s) => deleteSkillSection(db, s.id));
+
+    // Re-insert all sections in order (delete existing links + re-add preserves order)
+    keptSectionIds.forEach((id) => {
+      db.prepare('DELETE FROM skill_section_skills WHERE section_id = ?').run(id);
+      db.prepare('UPDATE skill_sections SET position = -1 WHERE id = ?').run(id);
+    });
+    db.prepare('DELETE FROM skill_sections WHERE resume_id = ? AND position >= 0').run(resumeId);
+
+    input.skillSections.forEach((section, idx) => {
+      const sectionId =
+        section.type === 'new'
+          ? createSkillSection(db, { resumeId, title: section.title }).id
+          : (() => {
+              db.prepare('UPDATE skill_sections SET title = ?, position = ? WHERE id = ?').run(
+                section.title,
+                idx,
+                section.id,
+              );
+              return section.id;
+            })();
+
+      section.skills.forEach((skill) => {
+        const skillId = skill.type === 'new' ? createSkill(db, { name: skill.name }).id : skill.id;
+        addSkillToSection(db, sectionId, skillId);
+      });
+    });
   }
 
   redirect(`/resumes/${resumeId}`);

@@ -11,6 +11,7 @@ Status: ready-for-agent
 Introduce the DB schema for skills (`skills`, `skill_sections`, `skill_section_skills` with `position` columns) and add a Skill Sections area to the resume editor.
 
 The job seeker can:
+
 - Create named skill sections (e.g. "Tech Skills", "Soft Skills") with an editable title
 - Delete a section
 - Add new skills inline within a section — 1–2 words, enforced client-side and server-side
@@ -26,6 +27,7 @@ Added skills appear as chips/badges inside their section card. Everything saves 
 - [ ] A section can be deleted (with its skill links)
 - [ ] Within a section, an inline input lets the user type a new skill and add it as a chip; 1–2 words enforced
 - [ ] A skill chip has a remove button
+- [ ] A skill is removed from db if no referenced from other resumes
 - [ ] Sections and their skills persist on save and reload correctly
 - [ ] `EditorSkillSection` and `EditorSkill` types follow the `type: 'new' | 'existing'` pattern from `editor-types.ts`
 

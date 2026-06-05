@@ -7,20 +7,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Resume } from '@/lib/resumes';
-import type { EditorWorkExperience } from '../../../_components/editor-types';
-import { toActionInput } from '../../../_components/editor-utils';
+import type { EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
+import { toActionInput, toSkillSectionsActionInput } from '../../../_components/editor-utils';
+import { SkillSectionsArea } from '../../../_components/skill-sections-area';
 import { WorkExperienceSection } from '../../../_components/work-experience-section';
 
 interface EditResumeEditorProps {
   resume: Resume;
   initialWorkExperiences: EditorWorkExperience[];
+  initialSkillSections: EditorSkillSection[];
 }
 
-export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeEditorProps) {
+export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections }: EditResumeEditorProps) {
   const [title, setTitle] = useState(resume.title);
   const [targetRole, setTargetRole] = useState(resume.targetRole);
   const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
   const [workExperiences, setWorkExperiences] = useState<EditorWorkExperience[]>(initialWorkExperiences);
+  const [skillSections, setSkillSections] = useState<EditorSkillSection[]>(initialSkillSections);
   const [accomplishmentsToDelete, setAccomplishmentsToDelete] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +35,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeE
       targetRole,
       targetCompany,
       workExperiences: toActionInput(workExperiences),
+      skillSections: toSkillSectionsActionInput(skillSections),
       accomplishmentsToDelete,
     });
     if (result && 'error' in result) setError(result.error);
@@ -75,6 +79,8 @@ export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeE
         onChange={setWorkExperiences}
         onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}
       />
+
+      <SkillSectionsArea sections={skillSections} onChange={setSkillSections} />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

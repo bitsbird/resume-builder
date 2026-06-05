@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { getDb } from '@/lib/db';
 import { getResumeWithData } from '@/lib/resumes';
 import { generateId } from '@/lib/utils';
-import type { EditorAccomplishment, EditorWorkExperience } from '../../_components/editor-types';
+import type { EditorAccomplishment, EditorSkill, EditorSkillSection, EditorWorkExperience } from '../../_components/editor-types';
 import { EditResumeEditor } from './_components/edit-resume-editor';
 
 interface ResumeEditPageProps {
@@ -35,9 +35,23 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
     return { type: 'existing', localId: generateId(), id, data, accomplishments: editorAccomplishments };
   });
 
+  const initialSkillSections: EditorSkillSection[] = resume.skillSections.map((section) => {
+    const skills: EditorSkill[] = section.skills.map((skill) => ({
+      type: 'existing',
+      localId: generateId(),
+      id: skill.id,
+      name: skill.name,
+    }));
+    return { type: 'existing', localId: generateId(), id: section.id, title: section.title, skills };
+  });
+
   return (
     <main className="h-full">
-      <EditResumeEditor resume={resume} initialWorkExperiences={initialWorkExperiences} />
+      <EditResumeEditor
+        resume={resume}
+        initialWorkExperiences={initialWorkExperiences}
+        initialSkillSections={initialSkillSections}
+      />
     </main>
   );
 }

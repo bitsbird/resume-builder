@@ -3,17 +3,25 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { updateResumeWithDataAction } from '@/app/actions';
 import { EditResumeEditor } from '@/app/resumes/[id]/edit/_components/edit-resume-editor';
-import type { EditorWorkExperience } from '@/app/resumes/_components/editor-types';
+import type { EditorSkillSection, EditorWorkExperience } from '@/app/resumes/_components/editor-types';
 
 vi.mock('@/app/actions', () => ({
   updateResumeWithDataAction: vi.fn(),
 }));
 
-let capturedOnChange: ((wes: EditorWorkExperience[]) => void) | null = null;
+let capturedWeOnChange: ((wes: EditorWorkExperience[]) => void) | null = null;
+let capturedSkillOnChange: ((sections: EditorSkillSection[]) => void) | null = null;
 
 vi.mock('@/app/resumes/_components/work-experience-section', () => ({
   WorkExperienceSection: ({ onChange }: { onChange: (wes: EditorWorkExperience[]) => void }) => {
-    capturedOnChange = onChange;
+    capturedWeOnChange = onChange;
+    return null;
+  },
+}));
+
+vi.mock('@/app/resumes/_components/skill-sections-area', () => ({
+  SkillSectionsArea: ({ onChange }: { onChange: (sections: EditorSkillSection[]) => void }) => {
+    capturedSkillOnChange = onChange;
     return null;
   },
 }));
@@ -67,6 +75,7 @@ describe('EditResumeEditor', () => {
       <EditResumeEditor
         resume={mockResume}
         initialWorkExperiences={[newWorkExperience]}
+        initialSkillSections={[]}
       />,
     );
 
@@ -89,12 +98,13 @@ describe('EditResumeEditor', () => {
       targetCompany: 'Globex Corp',
       workExperiences: [{ type: 'new', data: newWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
+      skillSections: [],
     });
   });
 
   it('calls updateResumeWithDataAction with initial values when save is clicked without changes', async () => {
     render(
-      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} />,
+      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} />,
     );
 
     fireEvent.click(screen.getByTestId('edit-resume-save'));
@@ -106,6 +116,7 @@ describe('EditResumeEditor', () => {
       targetCompany: mockResume.targetCompany,
       workExperiences: [],
       accomplishmentsToDelete: [],
+      skillSections: [],
     });
   });
 
@@ -124,9 +135,9 @@ describe('EditResumeEditor', () => {
       accomplishments: [],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} />);
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} />);
 
-    act(() => capturedOnChange!([modifiedWorkExperience]));
+    act(() => capturedWeOnChange!([modifiedWorkExperience]));
 
     fireEvent.click(screen.getByTestId('edit-resume-save'));
 
@@ -137,6 +148,30 @@ describe('EditResumeEditor', () => {
       targetCompany: mockResume.targetCompany,
       workExperiences: [{ type: 'new', data: modifiedWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
+      skillSections: [],
     });
+  });
+
+  it('sends modified skill sections when save is clicked after SkillSectionsArea onChange fires', () => {
+    const newSection: EditorSkillSection = {
+      type: 'new',
+      localId: 'section-1',
+      title: 'Tech Skills',
+      skills: [{ type: 'new', localId: 'skill-1', name: 'React' }],
+    };
+
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} />);
+
+    act(() => capturedSkillOnChange!([newSection]));
+
+    fireEvent.click(screen.getByTestId('edit-resume-save'));
+
+    expect(updateResumeWithDataAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skillSections: [
+          { type: 'new', title: 'Tech Skills', skills: [{ type: 'new', name: 'React' }] },
+        ],
+      }),
+    );
   });
 });
