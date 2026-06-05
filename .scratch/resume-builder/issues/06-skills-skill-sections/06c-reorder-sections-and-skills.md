@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: cancelled
 
 # #06c — Reorder sections and skills
 
