@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #05b — List accomplishments under WE in editor
 

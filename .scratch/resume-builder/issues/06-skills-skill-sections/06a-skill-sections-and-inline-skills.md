@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #06a — Skill section management + inline skill adding
 

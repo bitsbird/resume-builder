@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #05c — Lookup dialog: select / deselect accomplishments (max 5)
 

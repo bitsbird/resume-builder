@@ -1,4 +1,4 @@
-Status: ready-for-agent
+Status: done
 
 # #05a — Add a new accomplishment inline
 
