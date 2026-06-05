@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Resume } from '@/lib/resumes';
+import type { Skill } from '@/lib/skills';
 import type { EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
 import { toActionInput, toSkillSectionsActionInput } from '../../../_components/editor-utils';
 import { SkillSectionsArea } from '../../../_components/skill-sections-area';
@@ -16,9 +17,10 @@ interface EditResumeEditorProps {
   resume: Resume;
   initialWorkExperiences: EditorWorkExperience[];
   initialSkillSections: EditorSkillSection[];
+  allSkills: Skill[];
 }
 
-export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections }: EditResumeEditorProps) {
+export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections, allSkills }: EditResumeEditorProps) {
   const [title, setTitle] = useState(resume.title);
   const [targetRole, setTargetRole] = useState(resume.targetRole);
   const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
@@ -80,7 +82,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
         onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}
       />
 
-      <SkillSectionsArea sections={skillSections} onChange={setSkillSections} />
+      <SkillSectionsArea sections={skillSections} allSkills={allSkills} onChange={setSkillSections} />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

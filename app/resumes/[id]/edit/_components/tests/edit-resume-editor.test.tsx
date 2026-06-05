@@ -75,7 +75,7 @@ describe('EditResumeEditor', () => {
       <EditResumeEditor
         resume={mockResume}
         initialWorkExperiences={[newWorkExperience]}
-        initialSkillSections={[]}
+        initialSkillSections={[]} allSkills={[]}
       />,
     );
 
@@ -104,7 +104,7 @@ describe('EditResumeEditor', () => {
 
   it('calls updateResumeWithDataAction with initial values when save is clicked without changes', async () => {
     render(
-      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} />,
+      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} allSkills={[]} />,
     );
 
     fireEvent.click(screen.getByTestId('edit-resume-save'));
@@ -135,7 +135,7 @@ describe('EditResumeEditor', () => {
       accomplishments: [],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} />);
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} allSkills={[]} />);
 
     act(() => capturedWeOnChange!([modifiedWorkExperience]));
 
@@ -160,7 +160,7 @@ describe('EditResumeEditor', () => {
       skills: [{ type: 'new', localId: 'skill-1', name: 'React' }],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} />);
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} allSkills={[]} />);
 
     act(() => capturedSkillOnChange!([newSection]));
 

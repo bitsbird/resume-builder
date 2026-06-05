@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import type { Skill } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
 import type { EditorSkill, EditorSkillSection } from './editor-types';
+import { SkillLookupDialog } from './skill-lookup-dialog';
 
 interface SkillSectionItemProps {
   section: EditorSkillSection;
+  allSkills: Skill[];
   onChange: (section: EditorSkillSection) => void;
   onRemove: () => void;
 }
@@ -18,9 +21,22 @@ function isValidSkillName(name: string): boolean {
   return name.trim().split(/\s+/).length <= 2;
 }
 
-export function SkillSectionItem({ section, onChange, onRemove }: SkillSectionItemProps) {
+export function SkillSectionItem({ section, allSkills, onChange, onRemove }: SkillSectionItemProps) {
   const [skillDraft, setSkillDraft] = useState('');
   const [skillNameError, setSkillNameError] = useState<string | null>(null);
+  const [isLookupOpen, setIsLookupOpen] = useState(false);
+
+  const sectionSkillIds = new Set(
+    section.skills
+      .filter((s): s is Extract<EditorSkill, { type: 'existing' }> => s.type === 'existing')
+      .map((s) => s.id),
+  );
+  const availableSkills = allSkills.filter((s) => !sectionSkillIds.has(s.id));
+
+  function handleLinkSkill(skill: Skill) {
+    const linked: EditorSkill = { type: 'existing', localId: generateId(), id: skill.id, name: skill.name };
+    onChange({ ...section, skills: [...section.skills, linked] });
+  }
 
   function handleTitleChange(title: string) {
     onChange({ ...section, title });
@@ -100,6 +116,15 @@ export function SkillSectionItem({ section, onChange, onRemove }: SkillSectionIt
           <Button type="button" variant="outline" size="sm" data-testid="skill-add" onClick={handleAddSkill}>
             Add
           </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            data-testid="skill-lookup-open"
+            onClick={() => setIsLookupOpen(true)}
+          >
+            Add saved skill
+          </Button>
         </div>
         {skillNameError && (
           <p data-testid="skill-name-error" className="text-sm text-red-600">
@@ -107,6 +132,13 @@ export function SkillSectionItem({ section, onChange, onRemove }: SkillSectionIt
           </p>
         )}
       </div>
+
+      <SkillLookupDialog
+        isOpen={isLookupOpen}
+        availableSkills={availableSkills}
+        onLink={handleLinkSkill}
+        onClose={() => setIsLookupOpen(false)}
+      />
     </div>
   );
 }

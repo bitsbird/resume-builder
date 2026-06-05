@@ -7,6 +7,7 @@ import {
   createSkill,
   createSkillSection,
   deleteSkillSection,
+  getAllSkills,
   getSkillSectionsForResume,
   removeSkillFromSection,
 } from '@/lib/skills';
@@ -24,6 +25,27 @@ describe('createSkill', () => {
   it('creates a skill and returns its id', () => {
     const result = createSkill(db, { name: 'TypeScript' });
     expect(result).toMatchObject({ id: expect.any(Number) });
+  });
+});
+
+describe('getAllSkills', () => {
+  it('returns all skills in the repository', () => {
+    const { id: id1 } = createSkill(db, { name: 'React' });
+    const { id: id2 } = createSkill(db, { name: 'TypeScript' });
+
+    const skills = getAllSkills(db);
+
+    expect(skills).toHaveLength(2);
+    expect(skills).toEqual(
+      expect.arrayContaining([
+        { id: id1, name: 'React' },
+        { id: id2, name: 'TypeScript' },
+      ]),
+    );
+  });
+
+  it('returns an empty array when there are no skills', () => {
+    expect(getAllSkills(db)).toEqual([]);
   });
 });
 

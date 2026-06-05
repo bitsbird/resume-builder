@@ -34,6 +34,10 @@ function toSkillSection(row: DbSkillSection): SkillSection {
   return { id: row.id, resumeId: row.resume_id, title: row.title, position: row.position };
 }
 
+export function getAllSkills(db: Database.Database): Skill[] {
+  return (db.prepare('SELECT * FROM skills ORDER BY name ASC').all() as DbSkill[]).map(toSkill);
+}
+
 export function createSkill(db: Database.Database, { name }: { name: string }): { id: number } {
   const result = db.prepare('INSERT INTO skills (name) VALUES (?)').run(name);
   return { id: result.lastInsertRowid as number };

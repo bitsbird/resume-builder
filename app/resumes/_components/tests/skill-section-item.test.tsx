@@ -3,9 +3,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { SkillSectionItem } from '@/app/resumes/_components/skill-section-item';
 import type { EditorSkill, EditorSkillSection } from '@/app/resumes/_components/editor-types';
+import type { Skill } from '@/lib/skills';
 
 const existingSkill: EditorSkill = { type: 'existing', localId: 'skill-1', id: 10, name: 'React' };
 const newSkill: EditorSkill = { type: 'new', localId: 'skill-2', name: 'Node.js' };
+
+const repoSkillA: Skill = { id: 10, name: 'React' };
+const repoSkillB: Skill = { id: 20, name: 'TypeScript' };
 
 const fullSection: EditorSkillSection = {
   type: 'existing',
@@ -27,6 +31,7 @@ describe('SkillSectionItem', () => {
     render(
       <SkillSectionItem
         section={fullSection}
+        allSkills={[repoSkillA, repoSkillB]}
         onChange={vi.fn()}
         onRemove={vi.fn()}
       />,
@@ -40,6 +45,7 @@ describe('SkillSectionItem', () => {
     render(
       <SkillSectionItem
         section={emptySection}
+        allSkills={[]}
         onChange={vi.fn()}
         onRemove={vi.fn()}
       />,
@@ -51,7 +57,7 @@ describe('SkillSectionItem', () => {
   it('calls onRemove when the delete button is clicked', () => {
     const onRemove = vi.fn();
     render(
-      <SkillSectionItem section={fullSection} onChange={vi.fn()} onRemove={onRemove} />,
+      <SkillSectionItem section={fullSection} allSkills={[repoSkillA, repoSkillB]} onChange={vi.fn()} onRemove={onRemove} />,
     );
     fireEvent.click(screen.getByTestId('skill-section-delete'));
     expect(onRemove).toHaveBeenCalledOnce();
@@ -60,7 +66,7 @@ describe('SkillSectionItem', () => {
   it('calls onChange with updated title when title input changes', () => {
     const onChange = vi.fn();
     render(
-      <SkillSectionItem section={fullSection} onChange={onChange} onRemove={vi.fn()} />,
+      <SkillSectionItem section={fullSection} allSkills={[repoSkillA, repoSkillB]} onChange={onChange} onRemove={vi.fn()} />,
     );
     fireEvent.change(screen.getByTestId('skill-section-title'), {
       target: { value: 'Updated Title' },
@@ -73,7 +79,7 @@ describe('SkillSectionItem', () => {
   it('calls onAddSkill with the trimmed name when a valid skill is submitted', () => {
     const onChange = vi.fn();
     render(
-      <SkillSectionItem section={emptySection} onChange={onChange} onRemove={vi.fn()} />,
+      <SkillSectionItem section={emptySection} allSkills={[]} onChange={onChange} onRemove={vi.fn()} />,
     );
     fireEvent.change(screen.getByTestId('skill-name-input'), {
       target: { value: '  TypeScript  ' },
@@ -91,7 +97,7 @@ describe('SkillSectionItem', () => {
   it('shows a validation error and does not call onChange when skill name has more than 2 words', () => {
     const onChange = vi.fn();
     render(
-      <SkillSectionItem section={emptySection} onChange={onChange} onRemove={vi.fn()} />,
+      <SkillSectionItem section={emptySection} allSkills={[]} onChange={onChange} onRemove={vi.fn()} />,
     );
     fireEvent.change(screen.getByTestId('skill-name-input'), {
       target: { value: 'too many words here' },
@@ -104,12 +110,45 @@ describe('SkillSectionItem', () => {
   it('calls onChange without the removed skill when a chip remove button is clicked', () => {
     const onChange = vi.fn();
     render(
-      <SkillSectionItem section={fullSection} onChange={onChange} onRemove={vi.fn()} />,
+      <SkillSectionItem section={fullSection} allSkills={[repoSkillA, repoSkillB]} onChange={onChange} onRemove={vi.fn()} />,
     );
     fireEvent.click(screen.getByTestId('skill-remove-skill-1'));
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({
         skills: expect.not.arrayContaining([expect.objectContaining({ localId: 'skill-1' })]),
+      }),
+    );
+  });
+
+  it('renders an "Add saved skill" button', () => {
+    render(
+      <SkillSectionItem
+        section={emptySection}
+        allSkills={[repoSkillA]}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('skill-lookup-open')).toBeInTheDocument();
+  });
+
+  it('calls onChange with the linked skill appended as type:existing when a skill is selected from the dialog', () => {
+    const onChange = vi.fn();
+    render(
+      <SkillSectionItem
+        section={emptySection}
+        allSkills={[repoSkillB]}
+        onChange={onChange}
+        onRemove={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('skill-lookup-open'));
+    fireEvent.click(screen.getByRole('button', { name: 'TypeScript' }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        skills: expect.arrayContaining([
+          expect.objectContaining({ type: 'existing', id: 20, name: 'TypeScript' }),
+        ]),
       }),
     );
   });

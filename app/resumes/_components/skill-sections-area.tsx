@@ -1,16 +1,18 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import type { Skill } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
 import type { EditorSkillSection } from './editor-types';
 import { SkillSectionItem } from './skill-section-item';
 
 interface SkillSectionsAreaProps {
   sections: EditorSkillSection[];
+  allSkills: Skill[];
   onChange: (sections: EditorSkillSection[]) => void;
 }
 
-export function SkillSectionsArea({ sections, onChange }: SkillSectionsAreaProps) {
+export function SkillSectionsArea({ sections, allSkills, onChange }: SkillSectionsAreaProps) {
   function addSection() {
     const newSection: EditorSkillSection = {
       type: 'new',
@@ -42,6 +44,7 @@ export function SkillSectionsArea({ sections, onChange }: SkillSectionsAreaProps
         <SkillSectionItem
           key={section.localId}
           section={section}
+          allSkills={allSkills}
           onChange={(updated) => updateSection(section.localId, updated)}
           onRemove={() => removeSection(section.localId)}
         />

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { getDb } from '@/lib/db';
 import { getResumeWithData } from '@/lib/resumes';
+import { getAllSkills } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
 import type { EditorAccomplishment, EditorSkill, EditorSkillSection, EditorWorkExperience } from '../../_components/editor-types';
 import { EditResumeEditor } from './_components/edit-resume-editor';
@@ -18,7 +19,9 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
     notFound();
   }
 
-  const resume = getResumeWithData(getDb(), resumeId);
+  const db = getDb();
+  const resume = getResumeWithData(db, resumeId);
+  const allSkills = getAllSkills(db);
 
   if (!resume) {
     notFound();
@@ -51,6 +54,7 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
         resume={resume}
         initialWorkExperiences={initialWorkExperiences}
         initialSkillSections={initialSkillSections}
+        allSkills={allSkills}
       />
     </main>
   );
