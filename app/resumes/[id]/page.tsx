@@ -66,6 +66,24 @@ export default async function ResumePage({ params }: ResumPageProps) {
           </div>
         </section>
       )}
+
+      {resume.skillSections.filter((s) => s.skills.length > 0).length > 0 && (
+        <section className="mt-8">
+          <h2 className="mb-4 text-xl font-semibold">Skills</h2>
+          <div className="flex flex-col gap-4">
+            {resume.skillSections
+              .filter((s) => s.skills.length > 0)
+              .map((section) => (
+                <div key={section.id}>
+                  <p data-testid="skill-section-title" className="font-semibold">{section.title}</p>
+                  <p data-testid="skill-section-skills" className="text-sm text-gray-700">
+                    {section.skills.map((sk) => sk.name).join(', ')}
+                  </p>
+                </div>
+              ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

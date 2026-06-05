@@ -83,4 +83,47 @@ describe('/resumes/[id] page', () => {
     render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
     expect(screen.queryAllByTestId('we-accomplishment')).toHaveLength(0);
   });
+
+  it('renders skill sections with their title and skills', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({
+      ...mockResume,
+      skillSections: [
+        { id: 1, resumeId: 1, title: 'Languages', position: 0, skills: [{ id: 10, name: 'TypeScript' }, { id: 11, name: 'Rust' }] },
+      ],
+    });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByTestId('skill-section-title')).toHaveTextContent('Languages');
+    expect(screen.getByTestId('skill-section-skills')).toHaveTextContent('TypeScript, Rust');
+  });
+
+  it('renders multiple skill sections in position order', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({
+      ...mockResume,
+      skillSections: [
+        { id: 1, resumeId: 1, title: 'Languages', position: 0, skills: [{ id: 10, name: 'TypeScript' }, { id: 11, name: 'Rust' }] },
+        { id: 2, resumeId: 1, title: 'Tools', position: 1, skills: [{ id: 20, name: 'Docker' }] },
+      ],
+    });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    const titles = screen.getAllByTestId('skill-section-title');
+    expect(titles[0]).toHaveTextContent('Languages');
+    expect(titles[1]).toHaveTextContent('Tools');
+    const skillLists = screen.getAllByTestId('skill-section-skills');
+    expect(skillLists[0]).toHaveTextContent('TypeScript, Rust');
+    expect(skillLists[1]).toHaveTextContent('Docker');
+  });
+
+  it('does not render skill sections that have no skills', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({
+      ...mockResume,
+      skillSections: [
+        { id: 1, resumeId: 1, title: 'Empty Section', position: 0, skills: [] },
+        { id: 2, resumeId: 1, title: 'Languages', position: 1, skills: [{ id: 10, name: 'TypeScript' }] },
+      ],
+    });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    const titles = screen.getAllByTestId('skill-section-title');
+    expect(titles).toHaveLength(1);
+    expect(titles[0]).toHaveTextContent('Languages');
+  });
 });
