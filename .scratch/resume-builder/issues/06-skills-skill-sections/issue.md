@@ -23,3 +23,10 @@ The live preview renders skill sections in the order defined for this resume.
 ## Blocked by
 
 - [#03 Resume editor shell](.scratch/resume-builder/issues/03-resume-editor-shell.md)
+
+## Subtasks
+
+- [ ] [#06a skill-sections-and-inline-skills](06a-skill-sections-and-inline-skills.md)
+- [ ] [#06b skill-lookup-dialog](06b-skill-lookup-dialog.md)
+- [ ] [#06c reorder-sections-and-skills](06c-reorder-sections-and-skills.md)
+- [ ] [#06d skills-in-preview](06d-skills-in-preview.md)
