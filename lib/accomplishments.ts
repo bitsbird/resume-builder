@@ -69,6 +69,23 @@ export function listAccomplishmentsForWe(
   ).map(toAccomplishment);
 }
 
+export function countAccomplishmentLinks(
+  db: Database.Database,
+  accomplishmentId: number,
+  excludeResumeId?: number,
+): number {
+  if (excludeResumeId !== undefined) {
+    const row = db
+      .prepare('SELECT COUNT(*) AS count FROM resume_work_experience_accomplishments WHERE accomplishment_id = ? AND resume_id != ?')
+      .get(accomplishmentId, excludeResumeId) as { count: number };
+    return row.count;
+  }
+  const row = db
+    .prepare('SELECT COUNT(*) AS count FROM resume_work_experience_accomplishments WHERE accomplishment_id = ?')
+    .get(accomplishmentId) as { count: number };
+  return row.count;
+}
+
 export function getAccomplishmentsForResumeWe(
   db: Database.Database,
   resumeId: number,

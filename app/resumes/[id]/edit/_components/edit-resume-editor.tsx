@@ -21,6 +21,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeE
   const [targetRole, setTargetRole] = useState(resume.targetRole);
   const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
   const [workExperiences, setWorkExperiences] = useState<EditorWorkExperience[]>(initialWorkExperiences);
+  const [accomplishmentsToDelete, setAccomplishmentsToDelete] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSave() {
@@ -31,6 +32,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeE
       targetRole,
       targetCompany,
       workExperiences: toActionInput(workExperiences),
+      accomplishmentsToDelete,
     });
     if (result && 'error' in result) setError(result.error);
   }
@@ -67,7 +69,12 @@ export function EditResumeEditor({ resume, initialWorkExperiences }: EditResumeE
         </div>
       </div>
 
-      <WorkExperienceSection workExperiences={workExperiences} onChange={setWorkExperiences} />
+      <WorkExperienceSection
+        workExperiences={workExperiences}
+        resumeId={resume.id}
+        onChange={setWorkExperiences}
+        onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}
+      />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

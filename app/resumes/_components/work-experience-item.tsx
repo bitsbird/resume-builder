@@ -17,6 +17,7 @@ interface WorkExperienceItemProps {
   onMoveUp: () => void;
   onMoveDown: () => void;
   onAddAccomplishment: (content: string) => void;
+  onOpenAccomplishmentLookup?: () => void;
 }
 
 export function WorkExperienceItem({
@@ -28,6 +29,7 @@ export function WorkExperienceItem({
   onMoveUp,
   onMoveDown,
   onAddAccomplishment,
+  onOpenAccomplishmentLookup,
 }: WorkExperienceItemProps) {
   const data = we.data;
   const [accomplishmentDraft, setAccomplishmentDraft] = useState('');
@@ -137,6 +139,18 @@ export function WorkExperienceItem({
             </li>
           ))}
         </ul>
+      )}
+
+      {we.type === 'existing' && (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          data-testid="acc-lookup-trigger"
+          onClick={onOpenAccomplishmentLookup}
+        >
+          Browse accomplishments
+        </Button>
       )}
 
       <div className="flex gap-2">

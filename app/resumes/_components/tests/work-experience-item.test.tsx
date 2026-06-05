@@ -233,4 +233,41 @@ describe('WorkExperienceItem', () => {
     fireEvent.click(screen.getByTestId('accomplishment-add'));
     expect(input).toHaveValue('');
   });
+
+  it('shows the Browse accomplishments button for an existing WE and calls onOpenAccomplishmentLookup when clicked', () => {
+    const onOpenAccomplishmentLookup = vi.fn();
+    render(
+      <WorkExperienceItem
+        we={fullWe}
+        isFirst={false}
+        isLast={false}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
+        onOpenAccomplishmentLookup={onOpenAccomplishmentLookup}
+      />,
+    );
+    const browseBtn = screen.getByTestId('acc-lookup-trigger');
+    expect(browseBtn).toBeInTheDocument();
+    fireEvent.click(browseBtn);
+    expect(onOpenAccomplishmentLookup).toHaveBeenCalledOnce();
+  });
+
+  it('does not show the Browse accomplishments button for a new WE', () => {
+    render(
+      <WorkExperienceItem
+        we={minimalWe}
+        isFirst={true}
+        isLast={true}
+        onChange={vi.fn()}
+        onRemove={vi.fn()}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onAddAccomplishment={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId('acc-lookup-trigger')).not.toBeInTheDocument();
+  });
 });

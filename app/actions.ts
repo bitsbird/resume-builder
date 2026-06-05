@@ -3,10 +3,12 @@
 import { redirect } from 'next/navigation';
 
 import {
+  countAccomplishmentLinks,
   createAccomplishment,
   linkAccomplishmentToResumeWe,
   listAccomplishmentsForWe,
 } from '@/lib/accomplishments';
+import type { Accomplishment } from '@/lib/accomplishments';
 import { getDb } from '@/lib/db';
 import { createResume, listResumes, updateResume } from '@/lib/resumes';
 import type { CreateResumeInput, Resume, WorkExperienceWithAccomplishments } from '@/lib/resumes';
@@ -21,6 +23,15 @@ import type { CreateWorkExperienceInput } from '@/lib/work-experiences';
 
 export async function getResumes(): Promise<Resume[]> {
   return listResumes(getDb());
+}
+
+export async function listAccomplishmentsForWeAction(weId: number): Promise<Accomplishment[]> {
+  return listAccomplishmentsForWe(getDb(), weId);
+}
+
+export async function checkAccomplishmentIsOrphanedAction(accId: number, resumeId?: number): Promise<boolean> {
+  if (resumeId === undefined) return false;
+  return countAccomplishmentLinks(getDb(), accId, resumeId) === 0;
 }
 
 export async function listAllWorkExperiencesAction(): Promise<WorkExperienceWithAccomplishments[]> {
@@ -100,6 +111,7 @@ export type UpdateResumeWithDataInput = {
   targetRole: string;
   targetCompany: string;
   workExperiences: WorkExperienceEntry[];
+  accomplishmentsToDelete?: number[];
 };
 
 export async function updateResumeWithDataAction(
@@ -127,6 +139,7 @@ export async function updateResumeWithDataAction(
   existingEntries.forEach((we) => updateWorkExperience(db, we.id, we.data));
 
   // Remove all remaining links so we can re-insert in correct order
+  db.prepare('DELETE FROM resume_work_experience_accomplishments WHERE resume_id = ?').run(resumeId);
   db.prepare('DELETE FROM resume_work_experiences WHERE resume_id = ?').run(resumeId);
 
   try {
@@ -137,6 +150,11 @@ export async function updateResumeWithDataAction(
     });
   } catch (e) {
     return { error: e instanceof Error ? e.message : 'Failed to save accomplishments' };
+  }
+
+  if (input.accomplishmentsToDelete && input.accomplishmentsToDelete.length > 0) {
+    const placeholders = input.accomplishmentsToDelete.map(() => '?').join(',');
+    db.prepare(`DELETE FROM accomplishments WHERE id IN (${placeholders})`).run(...input.accomplishmentsToDelete);
   }
 
   redirect(`/resumes/${resumeId}`);

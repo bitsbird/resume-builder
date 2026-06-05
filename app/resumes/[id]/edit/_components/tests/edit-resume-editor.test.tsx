@@ -88,6 +88,7 @@ describe('EditResumeEditor', () => {
       targetRole: 'Principal Engineer',
       targetCompany: 'Globex Corp',
       workExperiences: [{ type: 'new', data: newWorkExperience.data, accomplishments: [] }],
+      accomplishmentsToDelete: [],
     });
   });
 
@@ -104,6 +105,7 @@ describe('EditResumeEditor', () => {
       targetRole: mockResume.targetRole,
       targetCompany: mockResume.targetCompany,
       workExperiences: [],
+      accomplishmentsToDelete: [],
     });
   });
 
@@ -134,6 +136,7 @@ describe('EditResumeEditor', () => {
       targetRole: mockResume.targetRole,
       targetCompany: mockResume.targetCompany,
       workExperiences: [{ type: 'new', data: modifiedWorkExperience.data, accomplishments: [] }],
+      accomplishmentsToDelete: [],
     });
   });
 });

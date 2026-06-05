@@ -1,13 +1,20 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 import { WorkExperienceSection } from '@/app/resumes/_components/work-experience-section';
-import { listAllWorkExperiencesAction } from '@/app/actions';
+import {
+  listAllWorkExperiencesAction,
+  listAccomplishmentsForWeAction,
+  checkAccomplishmentIsOrphanedAction,
+} from '@/app/actions';
 import type { EditorWorkExperience } from '@/app/resumes/_components/editor-types';
 import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
+import type { Accomplishment } from '@/lib/accomplishments';
 
 vi.mock('@/app/actions', () => ({
   listAllWorkExperiencesAction: vi.fn(),
+  listAccomplishmentsForWeAction: vi.fn(),
+  checkAccomplishmentIsOrphanedAction: vi.fn(),
 }));
 
 const existingWe: WorkExperienceWithAccomplishments = {
@@ -38,6 +45,8 @@ const editorWe: EditorWorkExperience = {
 
 beforeEach(() => {
   vi.mocked(listAllWorkExperiencesAction).mockResolvedValue([]);
+  vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([]);
+  vi.mocked(checkAccomplishmentIsOrphanedAction).mockResolvedValue(false);
 });
 
 describe('WorkExperienceSection', () => {
@@ -138,5 +147,110 @@ describe('WorkExperienceSection', () => {
         }),
       ]),
     );
+  });
+
+  it('fetches accomplishments and opens the dialog when Browse is clicked on an existing WE', async () => {
+    const acc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([acc]);
+    render(<WorkExperienceSection workExperiences={[editorWe]} onChange={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    expect(await screen.findByLabelText('Built platform')).toBeInTheDocument();
+  });
+
+  it('links an accomplishment by adding it to the WE as type existing', async () => {
+    const acc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([acc]);
+    const onChange = vi.fn();
+    render(<WorkExperienceSection workExperiences={[editorWe]} onChange={onChange} />);
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    fireEvent.click(await screen.findByLabelText('Built platform'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          localId: editorWe.localId,
+          accomplishments: expect.arrayContaining([
+            expect.objectContaining({ type: 'existing', id: acc.id, content: acc.content }),
+          ]),
+        }),
+      ]),
+    );
+  });
+
+  it('unlinks a non-orphaned accomplishment directly without a confirmation prompt', async () => {
+    const linkedAcc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    const weWithAcc: EditorWorkExperience = {
+      ...editorWe,
+      accomplishments: [{ type: 'existing', localId: 'l-acc-1', id: linkedAcc.id, content: linkedAcc.content }],
+    };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([linkedAcc]);
+    vi.mocked(checkAccomplishmentIsOrphanedAction).mockResolvedValue(false);
+    const onChange = vi.fn();
+    render(<WorkExperienceSection workExperiences={[weWithAcc]} onChange={onChange} />);
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    fireEvent.click(await screen.findByLabelText('Built platform'));
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ localId: editorWe.localId, accomplishments: [] }),
+      ]),
+    ));
+    expect(screen.queryByTestId('acc-delete-confirm-dialog')).not.toBeInTheDocument();
+  });
+
+  it('shows a confirmation dialog before permanently removing an orphaned accomplishment', async () => {
+    const linkedAcc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    const weWithAcc: EditorWorkExperience = {
+      ...editorWe,
+      accomplishments: [{ type: 'existing', localId: 'l-acc-1', id: linkedAcc.id, content: linkedAcc.content }],
+    };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([linkedAcc]);
+    vi.mocked(checkAccomplishmentIsOrphanedAction).mockResolvedValue(true);
+    render(<WorkExperienceSection workExperiences={[weWithAcc]} onChange={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    fireEvent.click(await screen.findByLabelText('Built platform'));
+    expect(await screen.findByTestId('acc-delete-confirm-dialog')).toBeInTheDocument();
+  });
+
+  it('does not unlink when the user cancels the permanent-deletion confirmation', async () => {
+    const linkedAcc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    const weWithAcc: EditorWorkExperience = {
+      ...editorWe,
+      accomplishments: [{ type: 'existing', localId: 'l-acc-1', id: linkedAcc.id, content: linkedAcc.content }],
+    };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([linkedAcc]);
+    vi.mocked(checkAccomplishmentIsOrphanedAction).mockResolvedValue(true);
+    const onChange = vi.fn();
+    render(<WorkExperienceSection workExperiences={[weWithAcc]} onChange={onChange} />);
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    fireEvent.click(await screen.findByLabelText('Built platform'));
+    fireEvent.click(await screen.findByTestId('acc-delete-cancel'));
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
+  it('unlinks and marks for permanent deletion when the user confirms', async () => {
+    const linkedAcc: Accomplishment = { id: 201, weId: editorWe.id, content: 'Built platform' };
+    const weWithAcc: EditorWorkExperience = {
+      ...editorWe,
+      accomplishments: [{ type: 'existing', localId: 'l-acc-1', id: linkedAcc.id, content: linkedAcc.content }],
+    };
+    vi.mocked(listAccomplishmentsForWeAction).mockResolvedValue([linkedAcc]);
+    vi.mocked(checkAccomplishmentIsOrphanedAction).mockResolvedValue(true);
+    const onChange = vi.fn();
+    const onAccomplishmentsToDeleteChange = vi.fn();
+    render(
+      <WorkExperienceSection
+        workExperiences={[weWithAcc]}
+        onChange={onChange}
+        onAccomplishmentsToDeleteChange={onAccomplishmentsToDeleteChange}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('acc-lookup-trigger'));
+    fireEvent.click(await screen.findByLabelText('Built platform'));
+    fireEvent.click(await screen.findByTestId('acc-delete-confirm'));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({ localId: editorWe.localId, accomplishments: [] }),
+      ]),
+    );
+    expect(onAccomplishmentsToDeleteChange).toHaveBeenCalledWith([linkedAcc.id]);
   });
 });

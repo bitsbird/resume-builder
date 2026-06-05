@@ -6,6 +6,7 @@ import { createResume } from '@/lib/resumes';
 import { createWorkExperience, addWorkExperienceToResume } from '@/lib/work-experiences';
 import {
   createAccomplishment,
+  countAccomplishmentLinks,
   linkAccomplishmentToResumeWe,
   getAccomplishmentsForResumeWe,
   listAccomplishmentsForWe,
@@ -103,6 +104,89 @@ describe('listAccomplishmentsForWe', () => {
   it('returns an empty array when a WE has no accomplishments', () => {
     const { weId } = seedResumeAndWe();
     expect(listAccomplishmentsForWe(db, weId)).toEqual([]);
+  });
+});
+
+describe('countAccomplishmentLinks', () => {
+  it('returns 0 when the accomplishment is not linked to any resume', () => {
+    const { weId } = seedResumeAndWe();
+    const { id: accId } = createAccomplishment(db, { weId, content: 'Orphan' }) as { id: number };
+    expect(countAccomplishmentLinks(db, accId)).toBe(0);
+  });
+
+  it('returns 1 when the accomplishment is linked to exactly one resume/WE', () => {
+    const { resumeId, weId } = seedResumeAndWe();
+    const { id: accId } = createAccomplishment(db, { weId, content: 'Linked once' }) as { id: number };
+    linkAccomplishmentToResumeWe(db, resumeId, weId, accId);
+    expect(countAccomplishmentLinks(db, accId)).toBe(1);
+  });
+
+  it('returns 2 when the accomplishment is linked to two different resumes', () => {
+    const { resumeId: resumeId1, weId } = seedResumeAndWe();
+    const resumeResult2 = createResume(db, { title: 'R2', targetRole: 'Eng', targetCompany: 'B' });
+    const resumeId2 = (resumeResult2 as { id: number }).id;
+    addWorkExperienceToResume(db, resumeId2, weId);
+    const { id: accId } = createAccomplishment(db, { weId, content: 'Shared' }) as { id: number };
+    linkAccomplishmentToResumeWe(db, resumeId1, weId, accId);
+    linkAccomplishmentToResumeWe(db, resumeId2, weId, accId);
+    expect(countAccomplishmentLinks(db, accId)).toBe(2);
+  });
+
+  it('excludes the specified resume when excludeResumeId is provided', () => {
+    const { resumeId, weId } = seedResumeAndWe();
+    const { id: accId } = createAccomplishment(db, { weId, content: 'Shared' }) as { id: number };
+    linkAccomplishmentToResumeWe(db, resumeId, weId, accId);
+    // count excluding this resume = 0 (orphaned if removed from this resume)
+    expect(countAccomplishmentLinks(db, accId, resumeId)).toBe(0);
+  });
+
+  it('returns the count from other resumes when excludeResumeId is provided', () => {
+    const { resumeId: resumeId1, weId } = seedResumeAndWe();
+    const resumeResult2 = createResume(db, { title: 'R2', targetRole: 'Eng', targetCompany: 'B' });
+    const resumeId2 = (resumeResult2 as { id: number }).id;
+    addWorkExperienceToResume(db, resumeId2, weId);
+    const { id: accId } = createAccomplishment(db, { weId, content: 'Shared' }) as { id: number };
+    linkAccomplishmentToResumeWe(db, resumeId1, weId, accId);
+    linkAccomplishmentToResumeWe(db, resumeId2, weId, accId);
+    // excluding resumeId1: still 1 link from resumeId2 → not orphaned
+    expect(countAccomplishmentLinks(db, accId, resumeId1)).toBe(1);
+  });
+});
+
+describe('permanent deletion', () => {
+  it('deletes the accomplishment row when its id is removed from the accomplishments table', () => {
+    const { weId } = seedResumeAndWe();
+    const { id: accId } = createAccomplishment(db, { weId, content: 'To be deleted' }) as { id: number };
+
+    const before = listAccomplishmentsForWe(db, weId);
+    expect(before).toHaveLength(1);
+
+    db.prepare('DELETE FROM accomplishments WHERE id = ?').run(accId);
+
+    const after = listAccomplishmentsForWe(db, weId);
+    expect(after).toHaveLength(0);
+  });
+});
+
+describe('re-linking after clearing all links', () => {
+  it('allows re-linking a subset of accomplishments after clearing (regression: UNIQUE constraint on update)', () => {
+    const { resumeId, weId } = seedResumeAndWe();
+    const { id: accId1 } = createAccomplishment(db, { weId, content: 'First' }) as { id: number };
+    const { id: accId2 } = createAccomplishment(db, { weId, content: 'Second' }) as { id: number };
+
+    linkAccomplishmentToResumeWe(db, resumeId, weId, accId1);
+    linkAccomplishmentToResumeWe(db, resumeId, weId, accId2);
+
+    // Simulate the clear-and-reinsert pattern used on save
+    db.prepare('DELETE FROM resume_work_experience_accomplishments WHERE resume_id = ?').run(resumeId);
+    db.prepare('DELETE FROM resume_work_experiences WHERE resume_id = ?').run(resumeId);
+
+    addWorkExperienceToResume(db, resumeId, weId);
+    expect(() => linkAccomplishmentToResumeWe(db, resumeId, weId, accId1)).not.toThrow();
+
+    const accs = getAccomplishmentsForResumeWe(db, resumeId, weId);
+    expect(accs).toHaveLength(1);
+    expect(accs[0]).toMatchObject({ id: accId1, content: 'First' });
   });
 });
 
