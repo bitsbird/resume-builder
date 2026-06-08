@@ -18,6 +18,7 @@ const mockResume = {
   profileSummary: 'Experienced engineer.',
   workExperiences: [],
   skillSections: [],
+  education: [],
 };
 
 beforeEach(() => {
@@ -111,6 +112,27 @@ describe('/resumes/[id] page', () => {
     const skillLists = screen.getAllByTestId('skill-section-skills');
     expect(skillLists[0]).toHaveTextContent('TypeScript, Rust');
     expect(skillLists[1]).toHaveTextContent('Docker');
+  });
+
+  it('renders education entries in the preview', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({
+      ...mockResume,
+      education: [
+        { id: 1, degree: 'BSc Computer Science', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' },
+        { id: 2, degree: 'MSc Software Engineering', institution: 'Stanford', startDate: '2019-09', endDate: null },
+      ],
+    });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByTestId('education-section')).toBeInTheDocument();
+    expect(screen.getByText('BSc Computer Science')).toBeInTheDocument();
+    expect(screen.getByText('MIT')).toBeInTheDocument();
+    expect(screen.getByText('MSc Software Engineering')).toBeInTheDocument();
+  });
+
+  it('does not render the education section when no entries are linked', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({ ...mockResume, education: [] });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.queryByTestId('education-section')).not.toBeInTheDocument();
   });
 
   it('does not render skill sections that have no skills', async () => {

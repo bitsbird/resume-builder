@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { Resume } from '@/lib/resumes';
 import type { Skill } from '@/lib/skills';
-import type { EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
-import { toActionInput, toSkillSectionsActionInput } from '../../../_components/editor-utils';
+import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
+import { toActionInput, toEducationActionInput, toSkillSectionsActionInput } from '../../../_components/editor-utils';
+import { EducationSection } from '../../../_components/education-section';
 import { SkillSectionsArea } from '../../../_components/skill-sections-area';
 import { WorkExperienceSection } from '../../../_components/work-experience-section';
 
@@ -17,15 +18,17 @@ interface EditResumeEditorProps {
   resume: Resume;
   initialWorkExperiences: EditorWorkExperience[];
   initialSkillSections: EditorSkillSection[];
+  initialEducation: EditorEducation[];
   allSkills: Skill[];
 }
 
-export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections, allSkills }: EditResumeEditorProps) {
+export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections, initialEducation, allSkills }: EditResumeEditorProps) {
   const [title, setTitle] = useState(resume.title);
   const [targetRole, setTargetRole] = useState(resume.targetRole);
   const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
   const [workExperiences, setWorkExperiences] = useState<EditorWorkExperience[]>(initialWorkExperiences);
   const [skillSections, setSkillSections] = useState<EditorSkillSection[]>(initialSkillSections);
+  const [education, setEducation] = useState<EditorEducation[]>(initialEducation);
   const [accomplishmentsToDelete, setAccomplishmentsToDelete] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,6 +41,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
       targetCompany,
       workExperiences: toActionInput(workExperiences),
       skillSections: toSkillSectionsActionInput(skillSections),
+      education: toEducationActionInput(education),
       accomplishmentsToDelete,
     });
     if (result && 'error' in result) setError(result.error);
@@ -83,6 +87,8 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
       />
 
       <SkillSectionsArea sections={skillSections} allSkills={allSkills} onChange={setSkillSections} />
+
+      <EducationSection education={education} onChange={setEducation} />
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 

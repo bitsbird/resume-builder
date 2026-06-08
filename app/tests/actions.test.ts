@@ -2,13 +2,14 @@ import { redirect } from 'next/navigation';
 
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { createResumeAction, createResumeWithDataAction, updateResumeWithDataAction } from '@/app/actions';
+import { createResumeAction, createResumeWithDataAction, listAllEducationAction, updateResumeWithDataAction } from '@/app/actions';
 import { initDb } from '@/lib/db';
 import { getDb } from '@/lib/db';
 import { getWorkExperiencesForResume, listAllWorkExperiences } from '@/lib/work-experiences';
 import { getAccomplishmentsForResumeWe } from '@/lib/accomplishments';
-import { listResumes, getResumeWithData } from '@/lib/resumes';
+import { createResume, listResumes, getResumeWithData } from '@/lib/resumes';
 import { getSkillSectionsForResume } from '@/lib/skills';
+import { addEducationToResume, createEducation, getEducationForResume, listAllEducation } from '@/lib/educations';
 
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
 vi.mock('@/lib/db', async (importOriginal) => {
@@ -383,5 +384,123 @@ describe('updateResumeWithDataAction', () => {
     expect(resume?.skillSections).toHaveLength(1);
     expect(resume?.skillSections[0]).toMatchObject({ title: 'Tech Skills' });
     expect(resume?.skillSections[0].skills[0]).toMatchObject({ name: 'TypeScript' });
+  });
+
+  it('creates and links new education entries', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      education: [
+        { type: 'new', data: { degree: 'BSc Computer Science', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } },
+        { type: 'new', data: { degree: 'MSc Software Engineering', institution: 'Stanford', startDate: '2019-09', endDate: null } },
+      ],
+    });
+
+    const entries = getEducationForResume(db, resumeId);
+    expect(entries).toHaveLength(2);
+    expect(entries[0]).toMatchObject({ degree: 'MSc Software Engineering', institution: 'Stanford', endDate: null });
+    expect(entries[1]).toMatchObject({ degree: 'BSc Computer Science', institution: 'MIT', endDate: '2019-06' });
+  });
+
+  it('updates existing education entries on re-save', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      education: [
+        { type: 'new', data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } },
+      ],
+    });
+
+    const eduId = getEducationForResume(db, resumeId)[0].id;
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      education: [
+        { type: 'existing', id: eduId, data: { degree: 'BSc Computer Science', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } },
+      ],
+    });
+
+    const entries = getEducationForResume(db, resumeId);
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({ id: eduId, degree: 'BSc Computer Science' });
+  });
+
+  it('links an existing education entry from another resume when added via lookup', async () => {
+    const resumeId = await seedResume();
+    const otherResumeId = (createResume(db, { title: 'Other Resume', targetRole: '', targetCompany: '' }) as { id: number }).id;
+    const { id: eduId } = createEducation(db, { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' });
+    addEducationToResume(db, otherResumeId, eduId);
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      education: [
+        { type: 'existing', id: eduId, data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } },
+      ],
+    });
+
+    expect(getEducationForResume(db, resumeId)).toHaveLength(1);
+    expect(getEducationForResume(db, resumeId)[0].id).toBe(eduId);
+  });
+
+  it('unlinks and deletes orphaned education entries removed from the list', async () => {
+    const resumeId = await seedResume();
+
+    await updateResumeWithDataAction({
+      resumeId,
+      ...baseFields,
+      workExperiences: [],
+      education: [
+        { type: 'new', data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } },
+      ],
+    });
+
+    await updateResumeWithDataAction({ resumeId, ...baseFields, workExperiences: [], education: [] });
+
+    expect(getEducationForResume(db, resumeId)).toHaveLength(0);
+    expect(listAllEducation(db)).toHaveLength(0);
+  });
+});
+
+describe('listAllEducationAction', () => {
+  it('returns all education entries from the global pool', async () => {
+    createEducation(db, { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' });
+    createEducation(db, { degree: 'MBA', institution: 'Harvard', startDate: '2020-09', endDate: null });
+
+    const result = await listAllEducationAction();
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({ degree: 'BSc CS', institution: 'MIT' });
+    expect(result[1]).toMatchObject({ degree: 'MBA', institution: 'Harvard' });
+  });
+
+  it('returns an empty array when no education entries exist', async () => {
+    const result = await listAllEducationAction();
+    expect(result).toEqual([]);
+  });
+});
+
+describe('createResumeWithDataAction auto-links education', () => {
+  it('auto-links all existing education entries when creating a new resume', async () => {
+    addEducationToResume(
+      db,
+      (createResume(db, { title: 'Seed Resume', targetRole: '', targetCompany: '' }) as { id: number }).id,
+      createEducation(db, { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' }).id,
+    );
+
+    await createResumeWithDataAction({ title: 'New Resume', targetRole: 'Engineer', targetCompany: 'Acme', workExperiences: [] });
+
+    const resumes = listResumes(db);
+    const newResume = resumes.find((r) => r.title === 'New Resume')!;
+    expect(getEducationForResume(db, newResume.id)).toHaveLength(1);
   });
 });

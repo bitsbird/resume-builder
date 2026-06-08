@@ -10,6 +10,15 @@ import {
 } from '@/lib/accomplishments';
 import type { Accomplishment } from '@/lib/accomplishments';
 import { getDb } from '@/lib/db';
+import {
+  addEducationToResume,
+  createEducation,
+  getEducationForResume,
+  listAllEducation,
+  removeEducationFromResume,
+  updateEducation,
+} from '@/lib/educations';
+import type { Education } from '@/lib/educations';
 import { createResume, listResumes, updateResume } from '@/lib/resumes';
 import type { CreateResumeInput, Resume, WorkExperienceWithAccomplishments } from '@/lib/resumes';
 import {
@@ -39,6 +48,10 @@ export async function listAccomplishmentsForWeAction(weId: number): Promise<Acco
 export async function checkAccomplishmentIsOrphanedAction(accId: number, resumeId?: number): Promise<boolean> {
   if (resumeId === undefined) return false;
   return countAccomplishmentLinks(getDb(), accId, resumeId) === 0;
+}
+
+export async function listAllEducationAction(): Promise<Education[]> {
+  return listAllEducation(getDb());
 }
 
 export async function listAllWorkExperiencesAction(): Promise<WorkExperienceWithAccomplishments[]> {
@@ -109,6 +122,9 @@ export async function createResumeWithDataAction(
     return { error: e instanceof Error ? e.message : 'Failed to save accomplishments' };
   }
 
+  // Auto-link all existing education entries to the new resume
+  listAllEducation(db).forEach((edu) => addEducationToResume(db, resumeId, edu.id));
+
   redirect(`/resumes/${resumeId}`);
 }
 
@@ -120,6 +136,10 @@ type SkillSectionEntry =
   | { type: 'new'; title: string; skills: SkillEntry[] }
   | { type: 'existing'; id: number; title: string; skills: SkillEntry[] };
 
+type EducationEntry =
+  | { type: 'new'; data: { degree: string; institution: string; startDate: string; endDate: string | null } }
+  | { type: 'existing'; id: number; data: { degree: string; institution: string; startDate: string; endDate: string | null } };
+
 export type UpdateResumeWithDataInput = {
   resumeId: number;
   title: string;
@@ -128,6 +148,7 @@ export type UpdateResumeWithDataInput = {
   workExperiences: WorkExperienceEntry[];
   skillSections?: SkillSectionEntry[];
   accomplishmentsToDelete?: number[];
+  education?: EducationEntry[];
 };
 
 export async function updateResumeWithDataAction(
@@ -209,6 +230,32 @@ export async function updateResumeWithDataAction(
         addSkillToSection(db, sectionId, skillId);
       });
     });
+  }
+
+  if (input.education !== undefined) {
+    const keptEduIds = new Set(
+      input.education
+        .filter((e): e is Extract<EducationEntry, { type: 'existing' }> => e.type === 'existing')
+        .map((e) => e.id),
+    );
+
+    getEducationForResume(db, resumeId)
+      .filter((e) => !keptEduIds.has(e.id))
+      .forEach((e) => removeEducationFromResume(db, resumeId, e.id));
+
+    input.education
+      .filter((e): e is Extract<EducationEntry, { type: 'existing' }> => e.type === 'existing')
+      .forEach((e) => {
+        updateEducation(db, e.id, e.data);
+        addEducationToResume(db, resumeId, e.id);
+      });
+
+    input.education
+      .filter((e): e is Extract<EducationEntry, { type: 'new' }> => e.type === 'new')
+      .forEach((e) => {
+        const { id } = createEducation(db, e.data);
+        addEducationToResume(db, resumeId, id);
+      });
   }
 
   redirect(`/resumes/${resumeId}`);

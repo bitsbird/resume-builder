@@ -44,6 +44,7 @@ const mockResume = {
     },
   ],
   skillSections: [],
+  education: [],
 };
 
 beforeEach(() => {

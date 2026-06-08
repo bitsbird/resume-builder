@@ -6,7 +6,7 @@ Status: ready-for-agent
 
 Add education entry management to the resume editor. Education entries are shared entities belonging to the job seeker. Unlike Work Experiences and Skills, education is always fully included in every resume — there is no selection or ordering per resume.
 
-The editor gets an Education section with a `+` button to add entries inline. Each entry captures degree, institution, start date, and end date. All education entries always appear in the live preview.
+The editor gets an Education section with a `+` button to add entries inline. Each entry captures degree, institution, start date, and end date. All education entries always appear in the preview.
 
 ## Acceptance criteria
 

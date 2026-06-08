@@ -67,6 +67,24 @@ export default async function ResumePage({ params }: ResumPageProps) {
         </section>
       )}
 
+      {resume.education.length > 0 && (
+        <section data-testid="education-section" className="mt-8">
+          <h2 className="mb-4 text-xl font-semibold">Education</h2>
+          <div className="flex flex-col gap-4">
+            {resume.education.map((edu) => (
+              <div key={edu.id} className="rounded border border-gray-200 p-4">
+                <p className="font-semibold">{edu.degree}</p>
+                <p className="text-gray-700">{edu.institution}</p>
+                <p className="text-sm text-gray-500">
+                  {edu.startDate}
+                  {edu.endDate ? ` – ${edu.endDate}` : ' – present'}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {resume.skillSections.filter((s) => s.skills.length > 0).length > 0 && (
         <section className="mt-8">
           <h2 className="mb-4 text-xl font-semibold">Skills</h2>

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { updateResumeWithDataAction } from '@/app/actions';
 import { EditResumeEditor } from '@/app/resumes/[id]/edit/_components/edit-resume-editor';
-import type { EditorSkillSection, EditorWorkExperience } from '@/app/resumes/_components/editor-types';
+import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from '@/app/resumes/_components/editor-types';
 
 vi.mock('@/app/actions', () => ({
   updateResumeWithDataAction: vi.fn(),
@@ -11,6 +11,7 @@ vi.mock('@/app/actions', () => ({
 
 let capturedWeOnChange: ((wes: EditorWorkExperience[]) => void) | null = null;
 let capturedSkillOnChange: ((sections: EditorSkillSection[]) => void) | null = null;
+let capturedEduOnChange: ((education: EditorEducation[]) => void) | null = null;
 
 vi.mock('@/app/resumes/_components/work-experience-section', () => ({
   WorkExperienceSection: ({ onChange }: { onChange: (wes: EditorWorkExperience[]) => void }) => {
@@ -22,6 +23,13 @@ vi.mock('@/app/resumes/_components/work-experience-section', () => ({
 vi.mock('@/app/resumes/_components/skill-sections-area', () => ({
   SkillSectionsArea: ({ onChange }: { onChange: (sections: EditorSkillSection[]) => void }) => {
     capturedSkillOnChange = onChange;
+    return null;
+  },
+}));
+
+vi.mock('@/app/resumes/_components/education-section', () => ({
+  EducationSection: ({ onChange }: { onChange: (education: EditorEducation[]) => void }) => {
+    capturedEduOnChange = onChange;
     return null;
   },
 }));
@@ -75,7 +83,9 @@ describe('EditResumeEditor', () => {
       <EditResumeEditor
         resume={mockResume}
         initialWorkExperiences={[newWorkExperience]}
-        initialSkillSections={[]} allSkills={[]}
+        initialSkillSections={[]}
+        initialEducation={[]}
+        allSkills={[]}
       />,
     );
 
@@ -99,12 +109,13 @@ describe('EditResumeEditor', () => {
       workExperiences: [{ type: 'new', data: newWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
       skillSections: [],
+      education: [],
     });
   });
 
   it('calls updateResumeWithDataAction with initial values when save is clicked without changes', async () => {
     render(
-      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} allSkills={[]} />,
+      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
     );
 
     fireEvent.click(screen.getByTestId('edit-resume-save'));
@@ -117,6 +128,7 @@ describe('EditResumeEditor', () => {
       workExperiences: [],
       accomplishmentsToDelete: [],
       skillSections: [],
+      education: [],
     });
   });
 
@@ -135,7 +147,7 @@ describe('EditResumeEditor', () => {
       accomplishments: [],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} allSkills={[]} />);
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
 
     act(() => capturedWeOnChange!([modifiedWorkExperience]));
 
@@ -149,6 +161,7 @@ describe('EditResumeEditor', () => {
       workExperiences: [{ type: 'new', data: modifiedWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
       skillSections: [],
+      education: [],
     });
   });
 
@@ -160,7 +173,7 @@ describe('EditResumeEditor', () => {
       skills: [{ type: 'new', localId: 'skill-1', name: 'React' }],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} allSkills={[]} />);
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
 
     act(() => capturedSkillOnChange!([newSection]));
 
@@ -171,6 +184,26 @@ describe('EditResumeEditor', () => {
         skillSections: [
           { type: 'new', title: 'Tech Skills', skills: [{ type: 'new', name: 'React' }] },
         ],
+      }),
+    );
+  });
+
+  it('sends modified education when save is clicked after EducationSection onChange fires', () => {
+    const newEdu: EditorEducation = {
+      type: 'new',
+      localId: 'edu-1',
+      data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' },
+    };
+
+    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
+
+    act(() => capturedEduOnChange!([newEdu]));
+
+    fireEvent.click(screen.getByTestId('edit-resume-save'));
+
+    expect(updateResumeWithDataAction).toHaveBeenCalledWith(
+      expect.objectContaining({
+        education: [{ type: 'new', data: newEdu.data }],
       }),
     );
   });

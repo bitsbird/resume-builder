@@ -1,4 +1,5 @@
-import type { EditorAccomplishment, EditorSkill, EditorSkillSection, EditorWorkExperience } from './editor-types';
+import type { EditorAccomplishment, EditorEducation, EditorSkill, EditorSkillSection, EditorWorkExperience } from './editor-types';
+import type { CreateEducationInput } from '@/lib/educations';
 import type { CreateWorkExperienceInput } from '@/lib/work-experiences';
 
 type AccomplishmentEntry =
@@ -37,6 +38,18 @@ export function toActionInput(
       ? { type: 'new', data: we.data, accomplishments }
       : { type: 'existing', id: we.id, data: we.data, accomplishments };
   });
+}
+
+type EducationEntry =
+  | { type: 'new'; data: CreateEducationInput }
+  | { type: 'existing'; id: number; data: CreateEducationInput };
+
+export function toEducationActionInput(education: EditorEducation[]): EducationEntry[] {
+  return education.map((e) =>
+    e.type === 'new'
+      ? { type: 'new', data: e.data }
+      : { type: 'existing', id: e.id, data: e.data },
+  );
 }
 
 export function toSkillSectionsActionInput(sections: EditorSkillSection[]): SkillSectionEntry[] {

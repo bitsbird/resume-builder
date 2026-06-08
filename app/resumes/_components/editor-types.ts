@@ -1,3 +1,4 @@
+import type { CreateEducationInput } from '@/lib/educations';
 import type { CreateWorkExperienceInput } from '@/lib/work-experiences';
 
 export type EditorAccomplishment =
@@ -7,6 +8,10 @@ export type EditorAccomplishment =
 export type EditorWorkExperience =
   | { type: 'new'; localId: string; data: CreateWorkExperienceInput; accomplishments: EditorAccomplishment[] }
   | { type: 'existing'; localId: string; id: number; data: CreateWorkExperienceInput; accomplishments: EditorAccomplishment[] };
+
+export type EditorEducation =
+  | { type: 'new'; localId: string; data: CreateEducationInput }
+  | { type: 'existing'; localId: string; id: number; data: CreateEducationInput };
 
 export type EditorSkill =
   | { type: 'new'; localId: string; name: string }

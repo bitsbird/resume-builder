@@ -64,6 +64,20 @@ export function initDb(dbPath: string): Database.Database {
       position   INTEGER NOT NULL,
       PRIMARY KEY (section_id, skill_id)
     );
+
+    CREATE TABLE IF NOT EXISTS educations (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      degree      TEXT NOT NULL,
+      institution TEXT NOT NULL,
+      start_date  TEXT NOT NULL,
+      end_date    TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS resume_educations (
+      resume_id INTEGER NOT NULL REFERENCES resumes(id),
+      edu_id    INTEGER NOT NULL REFERENCES educations(id),
+      PRIMARY KEY (resume_id, edu_id)
+    );
   `);
   return db;
 }

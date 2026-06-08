@@ -4,7 +4,7 @@ import { getDb } from '@/lib/db';
 import { getResumeWithData } from '@/lib/resumes';
 import { getAllSkills } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
-import type { EditorAccomplishment, EditorSkill, EditorSkillSection, EditorWorkExperience } from '../../_components/editor-types';
+import type { EditorAccomplishment, EditorEducation, EditorSkill, EditorSkillSection, EditorWorkExperience } from '../../_components/editor-types';
 import { EditResumeEditor } from './_components/edit-resume-editor';
 
 interface ResumeEditPageProps {
@@ -48,12 +48,20 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
     return { type: 'existing', localId: generateId(), id: section.id, title: section.title, skills };
   });
 
+  const initialEducation: EditorEducation[] = resume.education.map((edu) => ({
+    type: 'existing',
+    localId: generateId(),
+    id: edu.id,
+    data: { degree: edu.degree, institution: edu.institution, startDate: edu.startDate, endDate: edu.endDate },
+  }));
+
   return (
     <main className="h-full">
       <EditResumeEditor
         resume={resume}
         initialWorkExperiences={initialWorkExperiences}
         initialSkillSections={initialSkillSections}
+        initialEducation={initialEducation}
         allSkills={allSkills}
       />
     </main>

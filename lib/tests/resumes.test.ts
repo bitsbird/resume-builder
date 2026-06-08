@@ -5,6 +5,7 @@ import { initDb } from '@/lib/db';
 import { createResume, getResume, getResumeWithData, listResumes, updateResume } from '@/lib/resumes';
 import { addWorkExperienceToResume, createWorkExperience } from '@/lib/work-experiences';
 import { createAccomplishment, linkAccomplishmentToResumeWe } from '@/lib/accomplishments';
+import { addEducationToResume, createEducation } from '@/lib/educations';
 
 let db: Database.Database;
 
@@ -201,5 +202,35 @@ describe('getResumeWithData', () => {
     const result = getResumeWithData(db, resumeId);
 
     expect(result?.workExperiences).toEqual([]);
+  });
+
+  it('includes linked education entries ordered by endDate descending (null first)', () => {
+    const { id: resumeId } = createResume(db, {
+      title: 'My Resume',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+    const { id: currentId } = createEducation(db, { degree: 'MSc', institution: 'MIT', startDate: '2021-09', endDate: null });
+    const { id: olderId } = createEducation(db, { degree: 'BSc', institution: 'MIT', startDate: '2017-09', endDate: '2021-06' });
+    addEducationToResume(db, resumeId, currentId);
+    addEducationToResume(db, resumeId, olderId);
+
+    const result = getResumeWithData(db, resumeId);
+
+    expect(result?.education).toHaveLength(2);
+    expect(result?.education[0]).toMatchObject({ id: currentId, degree: 'MSc', endDate: null });
+    expect(result?.education[1]).toMatchObject({ id: olderId, degree: 'BSc', endDate: '2021-06' });
+  });
+
+  it('returns an empty education array when none are linked', () => {
+    const { id: resumeId } = createResume(db, {
+      title: 'Empty Resume',
+      targetRole: '',
+      targetCompany: '',
+    }) as { id: number };
+
+    const result = getResumeWithData(db, resumeId);
+
+    expect(result?.education).toEqual([]);
   });
 });
