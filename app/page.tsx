@@ -1,7 +1,10 @@
 import Link from 'next/link';
 
+import { IconAddressBook } from '@tabler/icons-react';
+
 import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
+import { H1, H2 } from '@/components/ui/typography';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,22 +12,19 @@ export default async function Home() {
   const resumes = await getResumes();
 
   return (
-    <main className="p-8">
+    <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">My Resumes</h1>
-        <Link href="/resumes/new" data-testid="new-resume">
-          New Resume
-        </Link>
+        <H2>My Resumes</H2>
       </div>
       {resumes.length === 0 ? (
         <p className="text-muted-foreground">No resumes yet.</p>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid h-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {resumes.map((resume) => (
             <ResumeCard key={resume.id} resume={resume} />
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }
