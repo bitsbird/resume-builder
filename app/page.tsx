@@ -1,7 +1,3 @@
-import Link from 'next/link';
-
-import { IconAddressBook } from '@tabler/icons-react';
-
 import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
 import { H1, H2 } from '@/components/ui/typography';

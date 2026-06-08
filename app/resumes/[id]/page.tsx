@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { getDb } from '@/lib/db';
 import { getResumeWithData } from '@/lib/resumes';
 
+import { CloseButton } from './_components/close-button';
+
 interface ResumPageProps {
   params: Promise<{ id: string }>;
 }
@@ -24,7 +26,10 @@ export default async function ResumePage({ params }: ResumPageProps) {
   }
 
   return (
-    <main className="p-8">
+    <div>
+      <div className="flex justify-end">
+        <CloseButton />
+      </div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-3xl font-bold">{resume.title}</h1>
         <Button asChild>
@@ -93,7 +98,9 @@ export default async function ResumePage({ params }: ResumPageProps) {
               .filter((s) => s.skills.length > 0)
               .map((section) => (
                 <div key={section.id}>
-                  <p data-testid="skill-section-title" className="font-semibold">{section.title}</p>
+                  <p data-testid="skill-section-title" className="font-semibold">
+                    {section.title}
+                  </p>
                   <p data-testid="skill-section-skills" className="text-sm text-gray-700">
                     {section.skills.map((sk) => sk.name).join(', ')}
                   </p>
@@ -102,6 +109,6 @@ export default async function ResumePage({ params }: ResumPageProps) {
           </div>
         </section>
       )}
-    </main>
+    </div>
   );
 }

@@ -12,8 +12,8 @@ export function ResumeCard({ resume }: ResumeCardProps) {
   const formattedDate =
     parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.toLocaleDateString() : null;
   return (
-    <Link href={`/resumes/${resume.id}`}>
-      <Card className="hover:bg-accent transition-colors">
+    <Link href={`/resumes/${resume.id}`} className="h-full">
+      <Card className="hover:bg-accent h-full transition-colors">
         <CardHeader>
           <CardTitle>{resume.title}</CardTitle>
         </CardHeader>
