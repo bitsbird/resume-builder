@@ -1,6 +1,6 @@
 import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
-import { H1, H2 } from '@/components/ui/typography';
+import { H2 } from '@/components/ui/typography';
 
 export const dynamic = 'force-dynamic';
 

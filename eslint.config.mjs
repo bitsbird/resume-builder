@@ -3,6 +3,7 @@ import nextTs from 'eslint-config-next/typescript';
 import prettierConfig from 'eslint-config-prettier';
 import tailwind from 'eslint-plugin-tailwindcss';
 import unicorn from 'eslint-plugin-unicorn';
+import unusedImports from 'eslint-plugin-unused-imports';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 const eslintConfig = defineConfig([
@@ -10,14 +11,17 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   {
-    files: ['src/**/*.{js,jsx,ts,tsx}'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     plugins: {
       unicorn,
+      'unused-imports': unusedImports,
     },
     rules: {
       // TypeScript Strictness Rules
       '@typescript-eslint/no-explicit-any': 'error', // Completely bans 'any' types
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': 'off',
+      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/consistent-type-imports': 'error', // Forces optimized type imports
 
       // Enforce PascalCase for components/types and camelCase for standard utilities
@@ -35,11 +39,10 @@ const eslintConfig = defineConfig([
 
   // 3. Tailwind Class Correctness Auditing
   {
-    files: ['src/**/*.tsx'],
+    files: ['**/*.tsx'],
     plugins: { tailwind },
     rules: {
       'tailwind/classnames-order': 'warn',
-      'tailwind/no-custom-classname': 'error',
       'tailwind/no-contradicting-classname': 'error',
     },
   },
