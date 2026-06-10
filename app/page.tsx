@@ -1,5 +1,8 @@
+import Link from 'next/link';
+
 import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
+import { Button } from '@/components/ui/button';
 import { H2 } from '@/components/ui/typography';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +14,9 @@ export default async function Home() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <H2>My Resumes</H2>
+        <Button asChild>
+          <Link data-testid="new-resume" href="/resumes/new">New Resume</Link>
+        </Button>
       </div>
       {resumes.length === 0 ? (
         <p className="text-muted-foreground">No resumes yet.</p>
