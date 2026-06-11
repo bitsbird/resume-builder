@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { Muted } from '@/components/ui/typography';
 import type { Accomplishment } from '@/lib/accomplishments';
 import type { EditorAccomplishment } from './editor-types';
 
@@ -61,9 +62,9 @@ export function AccomplishmentLookupDialog({
           <DialogTitle>Browse accomplishments</DialogTitle>
         </DialogHeader>
         {allAccomplishments.length === 0 ? (
-          <p data-testid="acc-lookup-empty" className="text-sm text-gray-500">
+          <Muted testId="acc-lookup-empty">
             No accomplishments found for this work experience.
-          </p>
+          </Muted>
         ) : (
           <div className="flex flex-col gap-2">
             {validationError && (
