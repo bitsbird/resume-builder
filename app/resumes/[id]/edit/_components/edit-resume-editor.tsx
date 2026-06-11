@@ -1,18 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-
 import { updateResumeWithDataAction } from '@/app/actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import type { Resume } from '@/lib/resumes';
 import type { Skill } from '@/lib/skills';
 import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
 import { toActionInput, toEducationActionInput, toSkillSectionsActionInput } from '../../../_components/editor-utils';
-import { EducationSection } from '../../../_components/education-section';
-import { SkillSectionsArea } from '../../../_components/skill-sections-area';
-import { WorkExperienceSection } from '../../../_components/work-experience-section';
+import type { ResumeFormData } from '../../../_components/resume-editor-form';
+import { ResumeEditorForm } from '../../../_components/resume-editor-form';
 
 interface EditResumeEditorProps {
   resume: Resume;
@@ -23,78 +17,31 @@ interface EditResumeEditorProps {
 }
 
 export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections, initialEducation, allSkills }: EditResumeEditorProps) {
-  const [title, setTitle] = useState(resume.title);
-  const [targetRole, setTargetRole] = useState(resume.targetRole);
-  const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
-  const [workExperiences, setWorkExperiences] = useState<EditorWorkExperience[]>(initialWorkExperiences);
-  const [skillSections, setSkillSections] = useState<EditorSkillSection[]>(initialSkillSections);
-  const [education, setEducation] = useState<EditorEducation[]>(initialEducation);
-  const [accomplishmentsToDelete, setAccomplishmentsToDelete] = useState<number[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSave() {
-    setError(null);
-    const result = await updateResumeWithDataAction({
+  async function handleSave(data: ResumeFormData) {
+    return updateResumeWithDataAction({
       resumeId: resume.id,
-      title,
-      targetRole,
-      targetCompany,
-      workExperiences: toActionInput(workExperiences),
-      skillSections: toSkillSectionsActionInput(skillSections),
-      education: toEducationActionInput(education),
-      accomplishmentsToDelete,
+      title: data.title,
+      targetRole: data.targetRole,
+      targetCompany: data.targetCompany,
+      workExperiences: toActionInput(data.workExperiences),
+      skillSections: toSkillSectionsActionInput(data.skillSections),
+      education: toEducationActionInput(data.education),
+      accomplishmentsToDelete: data.accomplishmentsToDelete,
     });
-    if (result && 'error' in result) setError(result.error);
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <Label>Title</Label>
-          <Input
-            data-testid="resume-title-input"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Resume title"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label>Target role</Label>
-          <Input
-            data-testid="resume-role-input"
-            value={targetRole}
-            onChange={(e) => setTargetRole(e.target.value)}
-            placeholder="e.g. Staff Engineer"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label>Target company</Label>
-          <Input
-            data-testid="resume-company-input"
-            value={targetCompany}
-            onChange={(e) => setTargetCompany(e.target.value)}
-            placeholder="e.g. Acme Corp"
-          />
-        </div>
-      </div>
-
-      <WorkExperienceSection
-        workExperiences={workExperiences}
-        resumeId={resume.id}
-        onChange={setWorkExperiences}
-        onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}
-      />
-
-      <SkillSectionsArea sections={skillSections} allSkills={allSkills} onChange={setSkillSections} />
-
-      <EducationSection education={education} onChange={setEducation} />
-
-      {error && <p className="text-sm text-red-600">{error}</p>}
-
-      <Button type="button" data-testid="edit-resume-save" onClick={handleSave}>
-        Save
-      </Button>
-    </div>
+    <ResumeEditorForm
+      initialTitle={resume.title}
+      initialTargetRole={resume.targetRole}
+      initialTargetCompany={resume.targetCompany}
+      initialWorkExperiences={initialWorkExperiences}
+      initialSkillSections={initialSkillSections}
+      initialEducation={initialEducation}
+      resumeId={resume.id}
+      allSkills={allSkills}
+      onSave={handleSave}
+      saveTestId="edit-resume-save"
+    />
   );
 }

@@ -83,6 +83,8 @@ export type CreateResumeWithDataInput = {
   targetRole: string;
   targetCompany: string;
   workExperiences: WorkExperienceEntry[];
+  skillSections?: SkillSectionEntry[];
+  education?: EducationEntry[];
 };
 
 function linkAccomplishments(
@@ -122,8 +124,32 @@ export async function createResumeWithDataAction(
     return { error: e instanceof Error ? e.message : 'Failed to save accomplishments' };
   }
 
-  // Auto-link all existing education entries to the new resume
-  listAllEducation(db).forEach((edu) => addEducationToResume(db, resumeId, edu.id));
+  if (input.skillSections) {
+    input.skillSections.forEach((section, idx) => {
+      const sectionId =
+        section.type === 'new'
+          ? createSkillSection(db, { resumeId, title: section.title }).id
+          : (() => {
+              db.prepare('UPDATE skill_sections SET title = ?, position = ? WHERE id = ?').run(
+                section.title,
+                idx,
+                section.id,
+              );
+              return section.id;
+            })();
+      section.skills.forEach((skill) => {
+        const skillId = skill.type === 'new' ? createSkill(db, { name: skill.name }).id : skill.id;
+        addSkillToSection(db, sectionId, skillId);
+      });
+    });
+  }
+
+  if (input.education) {
+    input.education.forEach((e) => {
+      const eduId = e.type === 'new' ? createEducation(db, e.data).id : e.id;
+      addEducationToResume(db, resumeId, eduId);
+    });
+  }
 
   redirect(`/resumes/${resumeId}`);
 }

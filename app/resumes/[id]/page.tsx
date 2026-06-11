@@ -42,9 +42,9 @@ export default async function ResumePage({ params }: ResumPageProps) {
               .filter((s) => s.skills.length > 0)
               .map((section) => (
                 <div key={section.id}>
-                  <Label testId="skill-section-title" className="mb-2">
+                  <H5 testId="skill-section-title" className="mb-2">
                     {section.title}
-                  </Label>
+                  </H5>
                   <BaseText testId="skill-section-skills">
                     {section.skills.map((sk) => sk.name).join(', ')}
                   </BaseText>

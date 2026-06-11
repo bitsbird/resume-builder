@@ -489,18 +489,28 @@ describe('listAllEducationAction', () => {
   });
 });
 
-describe('createResumeWithDataAction auto-links education', () => {
-  it('auto-links all existing education entries when creating a new resume', async () => {
-    addEducationToResume(
-      db,
-      (createResume(db, { title: 'Seed Resume', targetRole: '', targetCompany: '' }) as { id: number }).id,
-      createEducation(db, { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' }).id,
-    );
+describe('createResumeWithDataAction education', () => {
+  it('links education entries explicitly passed in the education param', async () => {
+    await createResumeWithDataAction({
+      title: 'New Resume',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+      workExperiences: [],
+      education: [{ type: 'new', data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' } }],
+    });
+
+    const resumes = listResumes(db);
+    const newResume = resumes.find((r) => r.title === 'New Resume')!;
+    expect(getEducationForResume(db, newResume.id)).toHaveLength(1);
+  });
+
+  it('does not auto-link existing education entries when education param is omitted', async () => {
+    createEducation(db, { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' });
 
     await createResumeWithDataAction({ title: 'New Resume', targetRole: 'Engineer', targetCompany: 'Acme', workExperiences: [] });
 
     const resumes = listResumes(db);
     const newResume = resumes.find((r) => r.title === 'New Resume')!;
-    expect(getEducationForResume(db, newResume.id)).toHaveLength(1);
+    expect(getEducationForResume(db, newResume.id)).toHaveLength(0);
   });
 });
