@@ -42,12 +42,12 @@ export default async function ResumePage({ params }: ResumPageProps) {
               .filter((s) => s.skills.length > 0)
               .map((section) => (
                 <div key={section.id}>
-                  <H5 testId="skill-section-title" className="mb-2">
+                  <Label testId="skill-section-title" className="mb-2">
                     {section.title}
-                  </H5>
-                  <Label data-testid="skill-section-skills">
-                    {section.skills.map((sk) => sk.name).join(', ')}
                   </Label>
+                  <BaseText data-testid="skill-section-skills">
+                    {section.skills.map((sk) => sk.name).join(', ')}
+                  </BaseText>
                 </div>
               ))}
           </div>
@@ -60,29 +60,29 @@ export default async function ResumePage({ params }: ResumPageProps) {
               <div key={we.id} className="mt-8 first:mt-0">
                 {we.header && <H5 className="mb-1 italic">{we.header}</H5>}
                 <div>
-                  <BaseText className="mr-2 font-bold">Employer:</BaseText>
-                  {we.employer}
+                  <Label className="mr-2">Employer:</Label>
+                  <BaseText>{we.employer}</BaseText>
                 </div>
                 <div>
-                  <BaseText className="mr-2 font-bold">Role:</BaseText>
-                  {we.role}
+                  <Label className="mr-2">Role:</Label>
+                  <BaseText>{we.role}</BaseText>
                 </div>
                 <div>
-                  <BaseText className="mr-2 font-bold">Dates:</BaseText>
+                  <Label className="mr-2">Dates:</Label>
                   {we.startDate}
                   {we.endDate ? ` – ${we.endDate}` : ' – present'}
                 </div>
                 <div>
-                  <BaseText className="mr-2 font-bold">Location:</BaseText>
-                  {we.location}
+                  <Label className="mr-2">Location:</Label>
+                  <BaseText>{we.location}</BaseText>
                 </div>
                 <div className="mt-2">
-                  <BaseText className="mr-2 font-bold">Accomplishments:</BaseText>
+                  <Label className="mr-2">Accomplishments:</Label>
                   {we.accomplishments.length > 0 && (
                     <ul className="ml-6 flex list-disc flex-col [&>li]:mt-2">
                       {we.accomplishments.map((acc) => (
                         <li key={acc.id} data-testid="we-accomplishment">
-                          {acc.content}
+                          <BaseText>{acc.content}</BaseText>
                         </li>
                       ))}
                     </ul>
@@ -100,7 +100,7 @@ export default async function ResumePage({ params }: ResumPageProps) {
             {resume.education.map((edu) => (
               <div key={edu.id}>
                 <div>
-                  <BaseText className="font-bold"> {edu.degree}</BaseText>
+                  <Label> {edu.degree}</Label>
                 </div>
                 <div>
                   <BaseText> {edu.institution}</BaseText>
