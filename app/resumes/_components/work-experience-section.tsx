@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { H3 } from '@/components/ui/typography';
 import { generateId, swapItems } from '@/lib/utils';
 import type { Accomplishment } from '@/lib/accomplishments';
 import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
@@ -167,7 +168,7 @@ export function WorkExperienceSection({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h3 className="font-semibold">Work Experience</h3>
+        <H3>Work Experience</H3>
         <Button type="button" variant="outline" size="sm" data-testid="we-add-new" onClick={addNew}>
           +
         </Button>

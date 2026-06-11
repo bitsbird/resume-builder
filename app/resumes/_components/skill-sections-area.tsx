@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { H3 } from '@/components/ui/typography';
 import type { Skill } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
 import type { EditorSkillSection } from './editor-types';
@@ -34,7 +35,7 @@ export function SkillSectionsArea({ sections, allSkills, onChange }: SkillSectio
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h3 className="font-semibold">Skill Sections</h3>
+        <H3>Skill Sections</H3>
         <Button type="button" variant="outline" size="sm" data-testid="skill-section-add" onClick={addSection}>
           + Add section
         </Button>

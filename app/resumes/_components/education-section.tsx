@@ -6,6 +6,7 @@ import { listAllEducationAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import type { Education } from '@/lib/educations';
 import { generateId } from '@/lib/utils';
+import { H3 } from '@/components/ui/typography';
 import type { EditorEducation } from './editor-types';
 import { EducationItem } from './education-item';
 import { EducationLookupDialog } from './education-lookup-dialog';
@@ -64,7 +65,7 @@ export function EducationSection({ education, onChange }: EducationSectionProps)
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
-        <h3 className="font-semibold">Education</h3>
+        <H3>Education</H3>
         <Button type="button" variant="outline" size="sm" data-testid="edu-add-new" onClick={addNew}>
           +
         </Button>
