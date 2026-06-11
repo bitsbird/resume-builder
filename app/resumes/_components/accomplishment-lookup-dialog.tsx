@@ -14,7 +14,7 @@ import { Muted } from '@/components/ui/typography';
 import type { Accomplishment } from '@/lib/accomplishments';
 import type { EditorAccomplishment } from './editor-types';
 
-const MAX_ACCOMPLISHMENTS = 5;
+const maxAccomplishments = 5;
 
 interface AccomplishmentLookupDialogProps {
   isOpen: boolean;
@@ -43,7 +43,7 @@ export function AccomplishmentLookupDialog({
 
   function handleCheckedChange(acc: Accomplishment, isChecked: boolean) {
     if (isChecked) {
-      if (selectedAccomplishments.length >= MAX_ACCOMPLISHMENTS) {
+      if (selectedAccomplishments.length >= maxAccomplishments) {
         setValidationError('Maximum of 5 accomplishments per work experience');
         return;
       }

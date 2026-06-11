@@ -47,12 +47,12 @@ export function createSkillSection(
   db: Database.Database,
   { resumeId, title }: { resumeId: number; title: string },
 ): { id: number } {
-  const { next_pos } = db
+  const { next_pos: nextPos } = db
     .prepare('SELECT COALESCE(MAX(position), -1) + 1 AS next_pos FROM skill_sections WHERE resume_id = ?')
     .get(resumeId) as { next_pos: number };
   const result = db
     .prepare('INSERT INTO skill_sections (resume_id, title, position) VALUES (?, ?, ?)')
-    .run(resumeId, title, next_pos);
+    .run(resumeId, title, nextPos);
   return { id: result.lastInsertRowid as number };
 }
 
@@ -61,11 +61,11 @@ export function addSkillToSection(
   sectionId: number,
   skillId: number,
 ): void {
-  const { next_pos } = db
+  const { next_pos: nextPos } = db
     .prepare('SELECT COALESCE(MAX(position), -1) + 1 AS next_pos FROM skill_section_skills WHERE section_id = ?')
     .get(sectionId) as { next_pos: number };
   db.prepare('INSERT INTO skill_section_skills (section_id, skill_id, position) VALUES (?, ?, ?)')
-    .run(sectionId, skillId, next_pos);
+    .run(sectionId, skillId, nextPos);
 }
 
 export function getSkillSectionsForResume(

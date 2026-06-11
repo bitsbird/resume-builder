@@ -47,7 +47,7 @@ export function linkAccomplishmentToResumeWe(
     throw new Error('Maximum of 5 accomplishments per work experience per resume');
   }
 
-  const { next_pos } = db
+  const { next_pos: nextPos } = db
     .prepare(
       'SELECT COALESCE(MAX(position), -1) + 1 AS next_pos FROM resume_work_experience_accomplishments WHERE resume_id = ? AND we_id = ?',
     )
@@ -55,7 +55,7 @@ export function linkAccomplishmentToResumeWe(
 
   db.prepare(
     'INSERT INTO resume_work_experience_accomplishments (resume_id, we_id, accomplishment_id, position) VALUES (?, ?, ?, ?)',
-  ).run(resumeId, weId, accomplishmentId, next_pos);
+  ).run(resumeId, weId, accomplishmentId, nextPos);
 }
 
 export function listAccomplishmentsForWe(

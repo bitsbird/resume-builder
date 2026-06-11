@@ -12,8 +12,8 @@ import { getSkillSectionsForResume } from '@/lib/skills';
 import { addEducationToResume, createEducation, getEducationForResume, listAllEducation } from '@/lib/educations';
 
 vi.mock('next/navigation', () => ({ redirect: vi.fn() }));
-vi.mock('@/lib/db', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/db')>();
+vi.mock('@/lib/db', async () => {
+  const actual = await import('@/lib/db');
   return { ...actual, getDb: vi.fn() };
 });
 
