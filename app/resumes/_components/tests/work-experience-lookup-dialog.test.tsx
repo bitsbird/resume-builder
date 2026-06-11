@@ -59,7 +59,7 @@ describe('WorkExperienceLookupDialog', () => {
         onClose={onClose}
       />,
     );
-    fireEvent.click(screen.getByTestId('we-lookup-close'));
+    fireEvent.click(screen.getByRole('button', { name: /close/i }));
     expect(onClose).toHaveBeenCalledOnce();
   });
 });
