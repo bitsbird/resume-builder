@@ -52,12 +52,12 @@ export function H4({ children, className, testId }: TypographyProps) {
 
 export function H5({ children, className, testId }: TypographyProps) {
   return (
-    <h4
+    <h5
       className={cn('text scroll-m-20 font-semibold tracking-tight', className)}
       data-testid={testId}
     >
       {children}
-    </h4>
+    </h5>
   );
 }
 

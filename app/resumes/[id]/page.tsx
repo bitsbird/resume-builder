@@ -45,7 +45,7 @@ export default async function ResumePage({ params }: ResumPageProps) {
                   <Label testId="skill-section-title" className="mb-2">
                     {section.title}
                   </Label>
-                  <BaseText data-testid="skill-section-skills">
+                  <BaseText testId="skill-section-skills">
                     {section.skills.map((sk) => sk.name).join(', ')}
                   </BaseText>
                 </div>
