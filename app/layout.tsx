@@ -1,5 +1,4 @@
 import { Geist, Geist_Mono, Inter } from 'next/font/google';
-import Link from 'next/link';
 
 import { IconAddressBook } from '@tabler/icons-react';
 import type { Metadata } from 'next';
@@ -48,11 +47,6 @@ export default function RootLayout({
           <header className="flex flex-row border-b p-8">
             <IconAddressBook className="mr-1 h-full self-center" />
             <H1 className="">Resume Builder</H1>
-            <div className="flex grow items-center justify-end">
-              <Link href="/resumes/new" data-testid="new-resume">
-                New Resume
-              </Link>
-            </div>
           </header>
           <main className="p-8">{children}</main>
         </div>
