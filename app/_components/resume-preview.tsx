@@ -1,3 +1,4 @@
+import { H5, Muted } from '@/components/ui/typography';
 import type { Resume } from '@/lib/resumes';
 
 interface ResumePreviewProps {
@@ -11,11 +12,9 @@ export function ResumePreview({ resume }: ResumePreviewProps) {
       data-slot="resume-preview"
       className="border-foreground/20 bg-muted/30 flex h-full flex-col gap-3 rounded-xl border border-dashed p-6"
     >
-      {resume.title && <p className="text-base font-semibold">{resume.title}</p>}
-      {resume.targetRole && <p className="text-muted-foreground text-sm">{resume.targetRole}</p>}
-      {resume.targetCompany && (
-        <p className="text-muted-foreground text-sm">{resume.targetCompany}</p>
-      )}
+      {resume.title && <H5>{resume.title}</H5>}
+      {resume.targetRole && <Muted>{resume.targetRole}</Muted>}
+      {resume.targetCompany && <Muted>{resume.targetCompany}</Muted>}
       <div className="mt-4 flex flex-col gap-2">
         {[...Array(6)].map((_, i) => (
           <div

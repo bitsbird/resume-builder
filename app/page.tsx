@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { ResumeCard } from '@/app/_components/resume-card';
 import { getResumes } from '@/app/actions';
 import { Button } from '@/components/ui/button';
-import { H2 } from '@/components/ui/typography';
+import { H2, Muted } from '@/components/ui/typography';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +19,7 @@ export default async function Home() {
         </Button>
       </div>
       {resumes.length === 0 ? (
-        <p className="text-muted-foreground">No resumes yet.</p>
+        <Muted>No resumes yet.</Muted>
       ) : (
         <div className="grid h-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {resumes.map((resume) => (

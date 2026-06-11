@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Muted } from '@/components/ui/typography';
 import type { Skill } from '@/lib/skills';
 
 interface SkillLookupDialogProps {
@@ -24,9 +25,9 @@ export function SkillLookupDialog({ isOpen, availableSkills, onLink, onClose }: 
           <DialogTitle>Add saved skill</DialogTitle>
         </DialogHeader>
         {availableSkills.length === 0 ? (
-          <p data-testid="skill-lookup-empty" className="text-sm text-gray-500">
+          <Muted testId="skill-lookup-empty">
             All saved skills are already in this section.
-          </p>
+          </Muted>
         ) : (
           <div className="flex flex-col gap-2">
             {availableSkills.map((skill) => (

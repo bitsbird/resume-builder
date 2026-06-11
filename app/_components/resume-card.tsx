@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Small } from '@/components/ui/typography';
 import type { Resume } from '@/lib/resumes';
 
 interface ResumeCardProps {
@@ -17,10 +18,10 @@ export function ResumeCard({ resume }: ResumeCardProps) {
         <CardHeader>
           <CardTitle>{resume.title}</CardTitle>
         </CardHeader>
-        <CardContent className="text-muted-foreground space-y-1 text-sm">
-          {resume.targetRole && <p>{resume.targetRole}</p>}
-          {resume.targetCompany && <p>{resume.targetCompany}</p>}
-          {formattedDate && <p>{formattedDate}</p>}
+        <CardContent className="space-y-1">
+          {resume.targetRole && <div><Small>{resume.targetRole}</Small></div>}
+          {resume.targetCompany && <div><Small>{resume.targetCompany}</Small></div>}
+          {formattedDate && <div><Small>{formattedDate}</Small></div>}
         </CardContent>
       </Card>
     </Link>
