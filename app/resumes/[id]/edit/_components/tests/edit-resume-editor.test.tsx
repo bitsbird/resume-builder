@@ -5,6 +5,12 @@ import { updateResumeWithDataAction } from '@/app/actions';
 import { EditResumeEditor } from '@/app/resumes/[id]/edit/_components/edit-resume-editor';
 import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from '@/app/resumes/_components/editor-types';
 
+const mockRouterPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}));
+
 vi.mock('@/app/actions', () => ({
   updateResumeWithDataAction: vi.fn(),
 }));
@@ -75,6 +81,7 @@ const existingWorkExperience: EditorWorkExperience = {
 
 beforeEach(() => {
   vi.mocked(updateResumeWithDataAction).mockReset();
+  mockRouterPush.mockReset();
 });
 
 describe('EditResumeEditor', () => {
@@ -206,5 +213,16 @@ describe('EditResumeEditor', () => {
         education: [{ type: 'new', data: newEdu.data }],
       }),
     );
+  });
+
+  it('cancel button navigates to resume view page without saving', () => {
+    render(
+      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
+    );
+
+    fireEvent.click(screen.getByTestId('edit-resume-cancel'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith(`/resumes/${mockResume.id}`);
+    expect(updateResumeWithDataAction).not.toHaveBeenCalled();
   });
 });

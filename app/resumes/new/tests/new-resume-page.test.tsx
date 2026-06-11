@@ -1,7 +1,13 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import NewResumePage from '@/app/resumes/new/page';
+
+const mockRouterPush = vi.fn();
+
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockRouterPush }),
+}));
 
 vi.mock('@/app/actions', () => ({
   createResumeWithDataAction: vi.fn(),
@@ -31,5 +37,11 @@ describe('/resumes/new page', () => {
     render(await NewResumePage());
     expect(screen.getByTestId('edu-add-new')).toBeInTheDocument();
     expect(screen.getByTestId('skill-section-add')).toBeInTheDocument();
+  });
+
+  it('cancel button navigates to home', async () => {
+    render(await NewResumePage());
+    fireEvent.click(screen.getByTestId('new-resume-cancel'));
+    expect(mockRouterPush).toHaveBeenCalledWith('/');
   });
 });

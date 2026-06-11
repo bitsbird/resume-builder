@@ -42,13 +42,13 @@ export default function RootLayout({
         inter.variable,
       )}
     >
-      <body className="dark flex min-h-full flex-col">
-        <div className="flex flex-col">
-          <header className="flex flex-row border-b p-8">
+      <body className="dark flex h-screen flex-col">
+        <div className="flex h-full flex-col">
+          <header className="flex shrink-0 flex-row border-b p-8">
             <IconAddressBook className="mr-1 h-full self-center" />
             <H1 className="">Resume Builder</H1>
           </header>
-          <main className="p-8">{children}</main>
+          <main className="min-h-0 flex-1 p-8">{children}</main>
         </div>
       </body>
     </html>
