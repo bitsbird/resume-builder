@@ -48,7 +48,7 @@ export default function RootLayout({
             <IconAddressBook className="mr-1 h-full self-center" />
             <H1 className="">Resume Builder</H1>
           </header>
-          <main className="min-h-0 flex-1 p-8">{children}</main>
+          <main className="min-h-0 flex-1 p-(--layout-padding) [--layout-padding:2rem]">{children}</main>
         </div>
       </body>
     </html>

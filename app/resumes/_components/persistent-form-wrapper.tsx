@@ -12,11 +12,17 @@ interface PersistentFormWrapperProps {
   cancelTestId?: string;
 }
 
-export function PersistentFormWrapper({ children, onSave, onCancel, saveTestId, cancelTestId }: PersistentFormWrapperProps) {
+export function PersistentFormWrapper({
+  children,
+  onSave,
+  onCancel,
+  saveTestId,
+  cancelTestId,
+}: PersistentFormWrapperProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex-1 overflow-y-auto">{children}</div>
-      <div className="flex shrink-0 justify-end gap-2 border-t px-6 py-3">
+      <div className="-mx-(--layout-padding) -mb-(--layout-padding) flex shrink-0 justify-center gap-2 border-t px-6 py-4">
         <Button variant="outline" data-testid={cancelTestId} onClick={onCancel}>
           Cancel
         </Button>
