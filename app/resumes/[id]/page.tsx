@@ -7,6 +7,7 @@ import { getResumeWithData } from '@/lib/resumes';
 
 import { ActionBar } from './_components/action-bar';
 import { ResumeSection } from './_components/resume-section';
+import { TemplateSelectorBar } from './_components/template-selector-bar';
 
 interface ResumPageProps {
   params: Promise<{ id: string }>;
@@ -28,6 +29,9 @@ export default async function ResumePage({ params }: ResumPageProps) {
 
   return (
     <div>
+      <div className="mb-4 flex items-center justify-between">
+        <TemplateSelectorBar resumeId={resumeId} />
+      </div>
       <div className="mb-4 flex items-center justify-between">
         <H2>{resume.title}</H2>
         <ActionBar resumeId={resumeId} />
