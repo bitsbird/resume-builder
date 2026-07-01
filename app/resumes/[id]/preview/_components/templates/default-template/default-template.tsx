@@ -54,7 +54,7 @@ export function DefaultTemplate({ resume }: TemplateProps) {
                   <span key={s.id}>
                     <SimpleText>
                       {i !== 0 ? ' - ' : ''}
-                      {s.name}{' '}
+                      {s.name}
                     </SimpleText>
                   </span>
                 ))}
@@ -63,6 +63,24 @@ export function DefaultTemplate({ resume }: TemplateProps) {
           </div>
         </TemplateSection>
         <WorkTemplateSection title="Work Experience" workExperiences={resume.workExperiences} />
+
+        <TemplateSection title="Education" noBorder={true}>
+          {resume.education.map((e) => (
+            <div key={e.id} className="pb-4 last:pb-0">
+              <div>
+                <SimpleLabel>{e.degree}</SimpleLabel>
+              </div>
+              <div>
+                <SimpleText>{e.institution}</SimpleText>
+              </div>
+              <div>
+                <SimpleText>
+                  {e.startDate} - {e.endDate ?? 'Present'}
+                </SimpleText>
+              </div>
+            </div>
+          ))}
+        </TemplateSection>
       </main>
     </div>
   );
