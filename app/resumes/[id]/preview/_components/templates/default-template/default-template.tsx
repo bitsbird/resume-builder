@@ -51,7 +51,7 @@ export function DefaultTemplate({ resume }: TemplateProps) {
               <div key={section.id}>
                 <SimpleLabel>{section.title}:</SimpleLabel>
                 {section.skills.map((s, i) => (
-                  <span key="{s.id}">
+                  <span key={s.id}>
                     <SimpleText>
                       {i !== 0 ? ' - ' : ''}
                       {s.name}{' '}
