@@ -45,6 +45,23 @@ export function DefaultTemplate({ resume }: TemplateProps) {
             </SimpleText>
           </div>
         </TemplateSection>
+        <TemplateSection title="Skills">
+          <div className="flex flex-4 flex-col">
+            {resume.skillSections.map((section) => (
+              <div key={section.id}>
+                <SimpleLabel>{section.title}:</SimpleLabel>
+                {section.skills.map((s, i) => (
+                  <span key="{s.id}">
+                    <SimpleText>
+                      {i !== 0 ? ' - ' : ''}
+                      {s.name}{' '}
+                    </SimpleText>
+                  </span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </TemplateSection>
         <WorkTemplateSection title="Work Experience" workExperiences={resume.workExperiences} />
       </main>
     </div>
