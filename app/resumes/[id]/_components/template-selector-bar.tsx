@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useState } from 'react';
+
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -12,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { defaultTemplateId, TEMPLATES } from '@/lib/templates';
+import { TEMPLATES, defaultTemplateId } from '@/lib/templates';
 
 interface TemplateSelectorBarProps {
   resumeId: number;

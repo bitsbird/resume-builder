@@ -6,10 +6,5 @@ interface PreviewLayoutProps {
 }
 
 export default function PreviewLayout({ children }: PreviewLayoutProps) {
-  return (
-    <div>
-      <p>Preview layout</p>
-      {children}
-    </div>
-  );
+  return <div>{children}</div>;
 }

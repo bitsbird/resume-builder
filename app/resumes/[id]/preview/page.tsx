@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation';
 
 import { getDb } from '@/lib/db';
 import { getResumeWithData } from '@/lib/resumes';
-import { defaultTemplateId, TEMPLATES } from '@/lib/templates';
+import { TEMPLATES, defaultTemplateId } from '@/lib/templates';
+
+import PreviewHeader from './_components/preview-header';
 
 interface PreviewPageProps {
   params: Promise<{ id: string }>;
@@ -24,5 +26,10 @@ export default async function PreviewPage({ params, searchParams }: PreviewPageP
 
   const TemplateComponent = await template.load();
 
-  return <TemplateComponent resume={resume} />;
+  return (
+    <div>
+      <PreviewHeader templateLabel={template.label} />
+      <TemplateComponent resume={resume} />
+    </div>
+  );
 }
