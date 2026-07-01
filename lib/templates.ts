@@ -15,7 +15,9 @@ export const TEMPLATES: Record<string, TemplateDefinition> = {
   default: {
     label: 'Default',
     load: async () =>
-      (await import('@/app/resumes/[id]/preview/_components/templates/default-template')).DefaultTemplate,
+      (
+        await import('@/app/resumes/[id]/preview/_components/templates/default-template/default-template')
+      ).DefaultTemplate,
   },
 };
 
