@@ -9,6 +9,7 @@ export type TemplateComponent = React.ComponentType<TemplateProps>;
 interface TemplateDefinition {
   label: string;
   load: () => Promise<TemplateComponent>;
+  loadPdf: () => Promise<TemplateComponent>;
 }
 
 export const TEMPLATES: Record<string, TemplateDefinition> = {
@@ -18,6 +19,10 @@ export const TEMPLATES: Record<string, TemplateDefinition> = {
       (
         await import('@/app/resumes/[id]/preview/_components/templates/default-template/default-template')
       ).DefaultTemplate,
+    loadPdf: async () =>
+      (
+        await import('@/app/resumes/[id]/preview/_components/templates/default-template/default-template-pdf')
+      ).DefaultTemplatePdf,
   },
 };
 
