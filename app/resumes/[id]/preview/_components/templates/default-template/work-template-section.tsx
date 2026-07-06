@@ -1,8 +1,7 @@
-import { Fragment } from 'react';
-
-import { H4 } from '@/components/ui/typography';
+import { resumeDesignTokens } from '@/app/resumes/[id]/preview/_lib/resume-design-tokens';
 import type { WorkExperienceWithAccomplishments } from '@/lib/resumes';
 
+import { ResumeHeading } from './resume-heading';
 import { SimpleLabel } from './simple-label';
 import { SimpleText } from './simple-text';
 
@@ -11,31 +10,30 @@ interface WorkTemplateSectionProps {
   title: string;
 }
 export default function WorkTemplateSection({ title, workExperiences }: WorkTemplateSectionProps) {
-  console.log(workExperiences);
   return (
-    <section className="pt-4 pb-4">
-      <div className="grid grid-cols-[2fr_4fr] gap-x-8 gap-y-4">
-        <div>
-          <H4>{title}</H4>
-        </div>
-        <div />
+    <section style={{ paddingTop: resumeDesignTokens.spacing[4], paddingBottom: resumeDesignTokens.spacing[4] }}>
+      <ResumeHeading size="sm">{title}</ResumeHeading>
+      <div
+        className="flex flex-col"
+        style={{ gap: resumeDesignTokens.spacing[4], paddingTop: resumeDesignTokens.spacing[4] }}
+      >
         {workExperiences.map((we) => (
-          <Fragment key={we.id}>
-            <div className="flex flex-col">
+          <div key={we.id} className="flex flex-row" style={{ gap: resumeDesignTokens.spacing[8] }}>
+            <div className="flex flex-2 flex-col">
               <SimpleLabel>{we.role}</SimpleLabel>
               <div>{we.employer}</div>
               <SimpleText>
                 {we.startDate} - {we.endDate ?? 'Present'}
               </SimpleText>
             </div>
-            <div>
+            <div className="flex-4">
               {we.accomplishments.map((a) => (
                 <div key={a.id}>
                   <SimpleText>{a.content}</SimpleText>
                 </div>
               ))}
             </div>
-          </Fragment>
+          </div>
         ))}
       </div>
     </section>

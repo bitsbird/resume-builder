@@ -1,6 +1,7 @@
-import { H1, H3 } from '@/components/ui/typography';
+import { resumeDesignTokens } from '@/app/resumes/[id]/preview/_lib/resume-design-tokens';
 import type { TemplateProps } from '@/lib/templates';
 
+import { ResumeHeading } from './resume-heading';
 import { SimpleLabel } from './simple-label';
 import { SimpleText } from './simple-text';
 import TemplateSection from './template-section';
@@ -8,12 +9,24 @@ import WorkTemplateSection from './work-template-section';
 
 export function DefaultTemplate({ resume }: TemplateProps) {
   return (
-    <div className="flex flex-col text-gray-600">
-      <header className="bg-blue-50 p-8">
-        <H1 className="pb-2">James Sommers</H1>
-        <H3>{resume.targetRole}</H3>
+    <div className="flex flex-col" style={{ color: resumeDesignTokens.colors.text }}>
+      <header
+        style={{
+          padding: resumeDesignTokens.spacing[8],
+          backgroundColor: resumeDesignTokens.colors.headerBackground,
+        }}
+      >
+        <ResumeHeading size="lg" style={{ paddingBottom: resumeDesignTokens.spacing[2] }}>
+          James Sommers
+        </ResumeHeading>
+        <ResumeHeading size="md">{resume.targetRole}</ResumeHeading>
       </header>
-      <main className="bg-white px-8">
+      <main
+        style={{
+          paddingInline: resumeDesignTokens.spacing[8],
+          backgroundColor: resumeDesignTokens.colors.bodyBackground,
+        }}
+      >
         <TemplateSection title="Contacts">
           <div>
             <div>
@@ -65,8 +78,11 @@ export function DefaultTemplate({ resume }: TemplateProps) {
         <WorkTemplateSection title="Work Experience" workExperiences={resume.workExperiences} />
 
         <TemplateSection title="Education" noBorder={true}>
-          {resume.education.map((e) => (
-            <div key={e.id} className="pb-4 last:pb-0">
+          {resume.education.map((e, i, arr) => (
+            <div
+              key={e.id}
+              style={{ paddingBottom: i === arr.length - 1 ? 0 : resumeDesignTokens.spacing[4] }}
+            >
               <div>
                 <SimpleLabel>{e.degree}</SimpleLabel>
               </div>

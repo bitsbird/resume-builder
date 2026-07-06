@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { H4 } from '@/components/ui/typography';
+import { resumeDesignTokens } from '@/app/resumes/[id]/preview/_lib/resume-design-tokens';
 import { cn } from '@/lib/utils';
+
+import { ResumeHeading } from './resume-heading';
 
 interface TemplateSectionProps {
   children: ReactNode;
@@ -10,11 +12,17 @@ interface TemplateSectionProps {
 }
 export default function TemplateSection({ title, noBorder, children }: TemplateSectionProps) {
   return (
-    <section className="flex flex-row pt-4">
-      <div className={cn('mr-8 flex-2', noBorder && 'border-0')}>
-        <H4>{title}</H4>
+    <section className="flex flex-row" style={{ paddingTop: resumeDesignTokens.spacing[4] }}>
+      <div
+        className={cn('flex-2', noBorder && 'border-0')}
+        style={{ marginRight: resumeDesignTokens.spacing[8] }}
+      >
+        <ResumeHeading size="sm">{title}</ResumeHeading>
       </div>
-      <div className={cn('flex flex-4 flex-col content-center pb-4', noBorder && 'border-0')}>
+      <div
+        className={cn('flex flex-4 flex-col content-center', noBorder && 'border-0')}
+        style={{ paddingBottom: resumeDesignTokens.spacing[4] }}
+      >
         {children}
       </div>
     </section>
