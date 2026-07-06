@@ -13,8 +13,8 @@ interface WorkTemplateSectionProps {
 export default function WorkTemplateSection({ title, workExperiences }: WorkTemplateSectionProps) {
   console.log(workExperiences);
   return (
-    <section className="pt-4">
-      <div className="[&>div:nth-last-child(-n+2)]:border-muted-foreground grid grid-cols-[2fr_4fr] gap-x-8 gap-y-4 [&>div:nth-last-child(-n+2)]:border-b-4 [&>div:nth-last-child(-n+2)]:pb-4">
+    <section className="pt-4 pb-4">
+      <div className="grid grid-cols-[2fr_4fr] gap-x-8 gap-y-4">
         <div>
           <H4>{title}</H4>
         </div>
