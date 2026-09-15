@@ -2,6 +2,7 @@
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import type { Skill } from '@/lib/skills';
 import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from './editor-types';
 import { EducationSection } from './education-section';
@@ -15,14 +16,16 @@ interface ResumeEditorFormProps {
   onTargetRoleChange: (value: string) => void;
   targetCompany: string;
   onTargetCompanyChange: (value: string) => void;
-  name?: string;
-  onNameChange?: (value: string) => void;
-  email?: string;
-  onEmailChange?: (value: string) => void;
-  phone?: string;
-  onPhoneChange?: (value: string) => void;
-  address?: string;
-  onAddressChange?: (value: string) => void;
+  profileSummary: string;
+  onProfileSummaryChange: (value: string) => void;
+  name: string;
+  onNameChange: (value: string) => void;
+  email: string;
+  onEmailChange: (value: string) => void;
+  phone: string;
+  onPhoneChange: (value: string) => void;
+  address: string;
+  onAddressChange: (value: string) => void;
   workExperiences: EditorWorkExperience[];
   onWorkExperiencesChange: (value: EditorWorkExperience[]) => void;
   onAccomplishmentsToDeleteChange: (value: number[]) => void;
@@ -42,6 +45,8 @@ export function ResumeEditorForm({
   onTargetRoleChange,
   targetCompany,
   onTargetCompanyChange,
+  profileSummary,
+  onProfileSummaryChange,
   name,
   onNameChange,
   email,
@@ -91,48 +96,55 @@ export function ResumeEditorForm({
             placeholder="e.g. Acme Corp"
           />
         </div>
+        <div className="flex flex-col gap-1">
+          <Label>Profile summary</Label>
+          <Textarea
+            data-testid="resume-profile-summary-input"
+            value={profileSummary}
+            onChange={(e) => onProfileSummaryChange(e.target.value)}
+            placeholder="A short, tailored summary highlighting your relevant skills"
+          />
+        </div>
       </div>
 
-      {onNameChange && onEmailChange && onPhoneChange && onAddressChange && (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1">
-            <Label>Name</Label>
-            <Input
-              data-testid="job-seeker-name-input"
-              value={name}
-              onChange={(e) => onNameChange(e.target.value)}
-              placeholder="e.g. Jane Doe"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Label>Email</Label>
-            <Input
-              data-testid="job-seeker-email-input"
-              value={email}
-              onChange={(e) => onEmailChange(e.target.value)}
-              placeholder="e.g. jane.doe@example.com"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Label>Phone</Label>
-            <Input
-              data-testid="job-seeker-phone-input"
-              value={phone}
-              onChange={(e) => onPhoneChange(e.target.value)}
-              placeholder="e.g. +1 555 123 4567"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <Label>Address</Label>
-            <Input
-              data-testid="job-seeker-address-input"
-              value={address}
-              onChange={(e) => onAddressChange(e.target.value)}
-              placeholder="e.g. 123 Main St, Springfield"
-            />
-          </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <Label>Name</Label>
+          <Input
+            data-testid="job-seeker-name-input"
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            placeholder="e.g. Jane Doe"
+          />
         </div>
-      )}
+        <div className="flex flex-col gap-1">
+          <Label>Email</Label>
+          <Input
+            data-testid="job-seeker-email-input"
+            value={email}
+            onChange={(e) => onEmailChange(e.target.value)}
+            placeholder="e.g. jane.doe@example.com"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label>Phone</Label>
+          <Input
+            data-testid="job-seeker-phone-input"
+            value={phone}
+            onChange={(e) => onPhoneChange(e.target.value)}
+            placeholder="e.g. +1 555 123 4567"
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label>Address</Label>
+          <Input
+            data-testid="job-seeker-address-input"
+            value={address}
+            onChange={(e) => onAddressChange(e.target.value)}
+            placeholder="e.g. 123 Main St, Springfield"
+          />
+        </div>
+      </div>
 
       <WorkExperienceSection
         workExperiences={workExperiences}

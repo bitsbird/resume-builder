@@ -8,6 +8,7 @@ interface UseResumeEditorFormOptions {
   title?: string;
   targetRole?: string;
   targetCompany?: string;
+  profileSummary?: string;
   name?: string;
   email?: string;
   phone?: string;
@@ -21,6 +22,7 @@ export function useResumeEditorForm({
   title: initialTitle = '',
   targetRole: initialTargetRole = '',
   targetCompany: initialTargetCompany = '',
+  profileSummary: initialProfileSummary = '',
   name: initialName = '',
   email: initialEmail = '',
   phone: initialPhone = '',
@@ -32,6 +34,7 @@ export function useResumeEditorForm({
   const [title, setTitle] = useState(initialTitle);
   const [targetRole, setTargetRole] = useState(initialTargetRole);
   const [targetCompany, setTargetCompany] = useState(initialTargetCompany);
+  const [profileSummary, setProfileSummary] = useState(initialProfileSummary);
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(initialEmail);
   const [phone, setPhone] = useState(initialPhone);
@@ -49,6 +52,8 @@ export function useResumeEditorForm({
     setTargetRole,
     targetCompany,
     setTargetCompany,
+    profileSummary,
+    setProfileSummary,
     name,
     setName,
     email,

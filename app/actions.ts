@@ -84,9 +84,11 @@ export type CreateResumeWithDataInput = {
   title: string;
   targetRole: string;
   targetCompany: string;
+  profileSummary?: string;
   workExperiences: WorkExperienceEntry[];
   skillSections?: SkillSectionEntry[];
   education?: EducationEntry[];
+  jobSeeker?: UpdateJobSeekerInput;
 };
 
 function linkAccomplishments(
@@ -110,11 +112,16 @@ export async function createResumeWithDataAction(
     title: input.title,
     targetRole: input.targetRole,
     targetCompany: input.targetCompany,
+    profileSummary: input.profileSummary,
   });
 
   if ('error' in resumeResult) return { error: resumeResult.error };
 
   const resumeId = resumeResult.id;
+
+  if (input.jobSeeker) {
+    updateJobSeeker(db, input.jobSeeker);
+  }
 
   try {
     input.workExperiences.forEach((we) => {
@@ -173,6 +180,7 @@ export type UpdateResumeWithDataInput = {
   title: string;
   targetRole: string;
   targetCompany: string;
+  profileSummary: string;
   workExperiences: WorkExperienceEntry[];
   skillSections?: SkillSectionEntry[];
   accomplishmentsToDelete?: number[];
@@ -184,9 +192,9 @@ export async function updateResumeWithDataAction(
   input: UpdateResumeWithDataInput,
 ): Promise<{ error: string } | void> {
   const db = getDb();
-  const { resumeId, title, targetRole, targetCompany, workExperiences } = input;
+  const { resumeId, title, targetRole, targetCompany, profileSummary, workExperiences } = input;
 
-  const resumeError = updateResume(db, resumeId, { title, targetRole, targetCompany });
+  const resumeError = updateResume(db, resumeId, { title, targetRole, targetCompany, profileSummary });
   if (resumeError) return resumeError;
 
   updateJobSeeker(db, input.jobSeeker);

@@ -124,6 +124,7 @@ describe('updateResumeWithDataAction', () => {
     title: 'My Resume',
     targetRole: 'Engineer',
     targetCompany: 'Acme',
+    profileSummary: '',
     jobSeeker: { name: '', email: '', phone: '', address: '' },
   };
 
@@ -140,6 +141,7 @@ describe('updateResumeWithDataAction', () => {
       title: 'Updated Resume',
       targetRole: 'Staff Engineer',
       targetCompany: 'Beta Corp',
+      profileSummary: '',
       jobSeeker: { name: '', email: '', phone: '', address: '' },
       workExperiences: [],
     });
@@ -156,6 +158,7 @@ describe('updateResumeWithDataAction', () => {
       title: '',
       targetRole: 'Engineer',
       targetCompany: 'Acme',
+      profileSummary: '',
       jobSeeker: { name: '', email: '', phone: '', address: '' },
       workExperiences: [],
     });

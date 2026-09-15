@@ -64,6 +64,18 @@ describe('/resumes/[id] page', () => {
     expect(screen.getByTestId('contacts-section')).toBeInTheDocument();
   });
 
+  it('renders the profile summary', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue(mockResume);
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByTestId('profile-section')).toHaveTextContent(mockResume.profileSummary);
+  });
+
+  it('does not render the profile section when the profile summary is empty', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue({ ...mockResume, profileSummary: '' });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.queryByTestId('profile-section')).not.toBeInTheDocument();
+  });
+
   it('renders an Edit link pointing to the edit route', async () => {
     vi.mocked(getResumeWithData).mockReturnValue(mockResume);
     render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));

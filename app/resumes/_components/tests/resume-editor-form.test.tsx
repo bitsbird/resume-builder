@@ -46,6 +46,8 @@ function fullProps() {
     onTargetRoleChange: noop,
     targetCompany: 'Acme',
     onTargetCompanyChange: noop,
+    profileSummary: 'Experienced backend engineer.',
+    onProfileSummaryChange: noop,
     name: 'Jane Doe',
     onNameChange: noop,
     email: 'jane.doe@example.com',
@@ -75,6 +77,16 @@ function emptyProps() {
     onTargetRoleChange: noop,
     targetCompany: '',
     onTargetCompanyChange: noop,
+    profileSummary: '',
+    onProfileSummaryChange: noop,
+    name: '',
+    onNameChange: noop,
+    email: '',
+    onEmailChange: noop,
+    phone: '',
+    onPhoneChange: noop,
+    address: '',
+    onAddressChange: noop,
     workExperiences: [],
     onWorkExperiencesChange: noop,
     onAccomplishmentsToDeleteChange: noop,
@@ -93,6 +105,7 @@ describe('ResumeEditorForm', () => {
     expect(screen.getByTestId('resume-title-input')).toHaveValue('My CV');
     expect(screen.getByTestId('resume-role-input')).toHaveValue('Staff Engineer');
     expect(screen.getByTestId('resume-company-input')).toHaveValue('Acme');
+    expect(screen.getByTestId('resume-profile-summary-input')).toHaveValue('Experienced backend engineer.');
     expect(screen.getByTestId('job-seeker-name-input')).toHaveValue('Jane Doe');
     expect(screen.getByTestId('job-seeker-email-input')).toHaveValue('jane.doe@example.com');
     expect(screen.getByTestId('job-seeker-phone-input')).toHaveValue('+1 555 123 4567');
@@ -102,16 +115,17 @@ describe('ResumeEditorForm', () => {
     expect(screen.getByTestId('edu-section-mock')).toBeInTheDocument();
   });
 
-  it('renders with empty/boundary prop values, omitting the contacts fields when their handlers are undefined', () => {
+  it('renders with empty/boundary prop values', () => {
     render(<ResumeEditorForm {...emptyProps()} />);
 
     expect(screen.getByTestId('resume-title-input')).toHaveValue('');
     expect(screen.getByTestId('resume-role-input')).toHaveValue('');
     expect(screen.getByTestId('resume-company-input')).toHaveValue('');
-    expect(screen.queryByTestId('job-seeker-name-input')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('job-seeker-email-input')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('job-seeker-phone-input')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('job-seeker-address-input')).not.toBeInTheDocument();
+    expect(screen.getByTestId('resume-profile-summary-input')).toHaveValue('');
+    expect(screen.getByTestId('job-seeker-name-input')).toHaveValue('');
+    expect(screen.getByTestId('job-seeker-email-input')).toHaveValue('');
+    expect(screen.getByTestId('job-seeker-phone-input')).toHaveValue('');
+    expect(screen.getByTestId('job-seeker-address-input')).toHaveValue('');
     expect(screen.getByTestId('we-section-mock')).toBeInTheDocument();
     expect(screen.getByTestId('skill-section-mock')).toBeInTheDocument();
     expect(screen.getByTestId('edu-section-mock')).toBeInTheDocument();

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { createResumeWithDataAction } from '@/app/actions';
+import type { JobSeeker } from '@/lib/job-seeker';
 import type { Skill } from '@/lib/skills';
 import { toActionInput, toEducationActionInput, toSkillSectionsActionInput } from '../../_components/editor-utils';
 import { PersistentFormWrapper } from '../../_components/persistent-form-wrapper';
@@ -11,20 +12,31 @@ import { useResumeEditorForm } from '../../_components/use-resume-editor-form';
 
 interface NewResumeEditorProps {
   allSkills: Skill[];
+  jobSeeker: JobSeeker;
 }
 
-export function NewResumeEditor({ allSkills }: NewResumeEditorProps) {
+export function NewResumeEditor({ allSkills, jobSeeker }: NewResumeEditorProps) {
   const router = useRouter();
   const {
     title, setTitle,
     targetRole, setTargetRole,
     targetCompany, setTargetCompany,
+    profileSummary, setProfileSummary,
+    name, setName,
+    email, setEmail,
+    phone, setPhone,
+    address, setAddress,
     workExperiences, setWorkExperiences,
     skillSections, setSkillSections,
     education, setEducation,
     setAccomplishmentsToDelete,
     error, setError,
-  } = useResumeEditorForm();
+  } = useResumeEditorForm({
+    name: jobSeeker.name,
+    email: jobSeeker.email,
+    phone: jobSeeker.phone,
+    address: jobSeeker.address,
+  });
 
   async function onSave() {
     setError(null);
@@ -32,6 +44,8 @@ export function NewResumeEditor({ allSkills }: NewResumeEditorProps) {
       title,
       targetRole,
       targetCompany,
+      profileSummary,
+      jobSeeker: { name, email, phone, address },
       workExperiences: toActionInput(workExperiences),
       skillSections: toSkillSectionsActionInput(skillSections),
       education: toEducationActionInput(education),
@@ -53,6 +67,16 @@ export function NewResumeEditor({ allSkills }: NewResumeEditorProps) {
         onTargetRoleChange={setTargetRole}
         targetCompany={targetCompany}
         onTargetCompanyChange={setTargetCompany}
+        profileSummary={profileSummary}
+        onProfileSummaryChange={setProfileSummary}
+        name={name}
+        onNameChange={setName}
+        email={email}
+        onEmailChange={setEmail}
+        phone={phone}
+        onPhoneChange={setPhone}
+        address={address}
+        onAddressChange={setAddress}
         workExperiences={workExperiences}
         onWorkExperiencesChange={setWorkExperiences}
         onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}

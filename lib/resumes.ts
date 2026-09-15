@@ -45,6 +45,7 @@ export type CreateResumeInput = {
   title: string;
   targetRole: string;
   targetCompany: string;
+  profileSummary?: string;
 };
 
 export function createResume(
@@ -57,9 +58,9 @@ export function createResume(
   try {
     const result = db
       .prepare(
-        'INSERT INTO resumes (title, target_role, target_company, template_id) VALUES (?, ?, ?, ?)',
+        'INSERT INTO resumes (title, target_role, target_company, template_id, profile_summary) VALUES (?, ?, ?, ?, ?)',
       )
-      .run(input.title, input.targetRole, input.targetCompany, 'default');
+      .run(input.title, input.targetRole, input.targetCompany, 'default', input.profileSummary ?? '');
     return { id: result.lastInsertRowid as number };
   } catch (e: unknown) {
     if (e instanceof Error && e.message.includes('UNIQUE constraint failed: resumes.title')) {
@@ -106,6 +107,7 @@ export type UpdateResumeInput = {
   title: string;
   targetRole: string;
   targetCompany: string;
+  profileSummary: string;
 };
 
 export function updateResume(
@@ -116,8 +118,8 @@ export function updateResume(
   if (!input.title.trim()) return { error: 'Title is required.' };
   try {
     db.prepare(
-      'UPDATE resumes SET title = ?, target_role = ?, target_company = ? WHERE id = ?',
-    ).run(input.title, input.targetRole, input.targetCompany, id);
+      'UPDATE resumes SET title = ?, target_role = ?, target_company = ?, profile_summary = ? WHERE id = ?',
+    ).run(input.title, input.targetRole, input.targetCompany, input.profileSummary, id);
   } catch (e: unknown) {
     if (e instanceof Error && e.message.includes('UNIQUE constraint failed: resumes.title')) {
       return { error: 'A resume with this title already exists.' };

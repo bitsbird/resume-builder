@@ -65,6 +65,12 @@ export default async function ResumePage({ params }: ResumPageProps) {
         </div>
       </ResumeSection>
 
+      {resume.profileSummary.length > 0 && (
+        <ResumeSection title="Profile" testId="profile-section">
+          <BaseText>{resume.profileSummary}</BaseText>
+        </ResumeSection>
+      )}
+
       {resume.skillSections.filter((s) => s.skills.length > 0).length > 0 && (
         <ResumeSection title="Skills">
           <div className="flex flex-col gap-4">

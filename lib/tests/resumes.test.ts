@@ -93,10 +93,28 @@ describe('updateResume', () => {
       targetCompany: 'Acme',
     }) as { id: number };
 
-    updateResume(db, id, { title: 'New Title', targetRole: 'Lead', targetCompany: 'Beta' });
+    updateResume(db, id, { title: 'New Title', targetRole: 'Lead', targetCompany: 'Beta', profileSummary: '' });
 
     const resume = getResume(db, id);
     expect(resume).toMatchObject({ title: 'New Title', targetRole: 'Lead', targetCompany: 'Beta' });
+  });
+
+  it('updates the profile summary', () => {
+    const { id } = createResume(db, {
+      title: 'Old Title',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+    }) as { id: number };
+
+    updateResume(db, id, {
+      title: 'Old Title',
+      targetRole: 'Engineer',
+      targetCompany: 'Acme',
+      profileSummary: 'Experienced backend engineer.',
+    });
+
+    const resume = getResume(db, id);
+    expect(resume).toMatchObject({ profileSummary: 'Experienced backend engineer.' });
   });
 
   it('returns an error when the new title is empty', () => {
@@ -106,7 +124,7 @@ describe('updateResume', () => {
       targetCompany: 'Acme',
     }) as { id: number };
 
-    const result = updateResume(db, id, { title: '', targetRole: 'Lead', targetCompany: 'Beta' });
+    const result = updateResume(db, id, { title: '', targetRole: 'Lead', targetCompany: 'Beta', profileSummary: '' });
 
     expect(result).toMatchObject({ error: expect.any(String) });
     expect(getResume(db, id)?.title).toBe('My Resume');
@@ -124,6 +142,7 @@ describe('updateResume', () => {
       title: 'Other Resume',
       targetRole: 'Lead',
       targetCompany: 'Beta',
+      profileSummary: '',
     });
 
     expect(result).toMatchObject({ error: expect.any(String) });

@@ -27,6 +27,7 @@ export function EditResumeEditor({ resume, jobSeeker, initialWorkExperiences, in
     title, setTitle,
     targetRole, setTargetRole,
     targetCompany, setTargetCompany,
+    profileSummary, setProfileSummary,
     name, setName,
     email, setEmail,
     phone, setPhone,
@@ -40,6 +41,7 @@ export function EditResumeEditor({ resume, jobSeeker, initialWorkExperiences, in
     title: resume.title,
     targetRole: resume.targetRole,
     targetCompany: resume.targetCompany,
+    profileSummary: resume.profileSummary,
     name: jobSeeker.name,
     email: jobSeeker.email,
     phone: jobSeeker.phone,
@@ -56,6 +58,7 @@ export function EditResumeEditor({ resume, jobSeeker, initialWorkExperiences, in
       title,
       targetRole,
       targetCompany,
+      profileSummary,
       jobSeeker: { name, email, phone, address },
       workExperiences: toActionInput(workExperiences),
       skillSections: toSkillSectionsActionInput(skillSections),
@@ -79,6 +82,8 @@ export function EditResumeEditor({ resume, jobSeeker, initialWorkExperiences, in
         onTargetRoleChange={setTargetRole}
         targetCompany={targetCompany}
         onTargetCompanyChange={setTargetCompany}
+        profileSummary={profileSummary}
+        onProfileSummaryChange={setProfileSummary}
         name={name}
         onNameChange={setName}
         email={email}

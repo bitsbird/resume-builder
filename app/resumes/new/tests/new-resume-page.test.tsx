@@ -19,6 +19,15 @@ vi.mock('@/lib/skills', () => ({
   getAllSkills: vi.fn().mockReturnValue([]),
 }));
 
+vi.mock('@/lib/job-seeker', () => ({
+  getJobSeeker: vi.fn().mockReturnValue({
+    name: 'James Sommers',
+    email: 'james.sommers@example.com',
+    phone: '+49 160 1234567',
+    address: 'Karl Liebknecht Strasse 104, Berlin, Germany',
+  }),
+}));
+
 describe('/resumes/new page', () => {
   it('renders the work experience section and save button', async () => {
     render(await NewResumePage());
@@ -37,6 +46,15 @@ describe('/resumes/new page', () => {
     render(await NewResumePage());
     expect(screen.getByTestId('edu-add-new')).toBeInTheDocument();
     expect(screen.getByTestId('skill-section-add')).toBeInTheDocument();
+  });
+
+  it('renders the profile summary and job seeker contact fields, preloaded with existing contact info', async () => {
+    render(await NewResumePage());
+    expect(screen.getByTestId('resume-profile-summary-input')).toBeInTheDocument();
+    expect(screen.getByTestId('job-seeker-name-input')).toHaveValue('James Sommers');
+    expect(screen.getByTestId('job-seeker-email-input')).toHaveValue('james.sommers@example.com');
+    expect(screen.getByTestId('job-seeker-phone-input')).toHaveValue('+49 160 1234567');
+    expect(screen.getByTestId('job-seeker-address-input')).toHaveValue('Karl Liebknecht Strasse 104, Berlin, Germany');
   });
 
   it('cancel button navigates to home', async () => {
