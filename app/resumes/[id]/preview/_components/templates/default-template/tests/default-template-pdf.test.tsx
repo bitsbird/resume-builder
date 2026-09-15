@@ -5,6 +5,13 @@ import { describe, expect, it } from 'vitest';
 import { DefaultTemplatePdf } from '@/app/resumes/[id]/preview/_components/templates/default-template/default-template-pdf';
 import type { ResumeWithData } from '@/lib/resumes';
 
+function normalizeWhitespace(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+const longProfileSummary =
+  'Building reliable backend systems for five years. This software engineering background bridges computer science foundations with practical industry skills, spanning data structures, algorithms, and object oriented programming in Python and Java. The full stack experience covers scalable web applications with React, Node.js, and PostgreSQL. DevOps work includes Docker containerization, CI CD pipelines, and AWS cloud management. Advanced projects explore distributed systems, microservices, and workflows like Agile and Git, culminating in a distributed system capstone that combined technical depth with collaborative delivery across modern engineering teams.';
+
 const fullResume: ResumeWithData = {
   id: 1,
   title: 'Senior Engineer CV',
@@ -12,7 +19,7 @@ const fullResume: ResumeWithData = {
   targetCompany: 'Acme Corp',
   createdAt: '2024-06-01T12:00:00.000Z',
   templateId: 'default',
-  profileSummary: 'Building reliable backend systems for five years.',
+  profileSummary: longProfileSummary,
   workExperiences: [
     {
       id: 1,
@@ -60,7 +67,7 @@ async function extractPdfText(resume: ResumeWithData): Promise<string> {
   const buffer = await renderToBuffer(<DefaultTemplatePdf resume={resume} />);
   const parser = new PDFParse({ data: buffer });
   const { text } = await parser.getText();
-  return text;
+  return normalizeWhitespace(text);
 }
 
 describe('DefaultTemplatePdf', () => {
@@ -76,6 +83,18 @@ describe('DefaultTemplatePdf', () => {
 
     expect(text).toContain('Profile');
     expect(text).toContain(fullResume.profileSummary);
+  });
+
+  it('renders the full profile summary without clipping any characters, even though it wraps across many lines', async () => {
+    const text = await extractPdfText(fullResume);
+
+    expect(text).toContain(normalizeWhitespace(longProfileSummary));
+  });
+
+  it('renders a header with the target role', async () => {
+    const text = await extractPdfText(fullResume);
+
+    expect(text).toContain(fullResume.targetRole);
   });
 
   it('renders the skills section with each skill section title and its skills', async () => {

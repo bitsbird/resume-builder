@@ -28,7 +28,7 @@ export default async function PreviewPage({ params, searchParams }: PreviewPageP
 
   return (
     <div>
-      <PreviewHeader templateLabel={template.label} />
+      <PreviewHeader templateLabel={template.label} resumeId={resumeId} templateId={templateId} />
       <TemplateComponent resume={resume} />
     </div>
   );

@@ -27,7 +27,7 @@ export function TemplateSelectorBar({ resumeId }: TemplateSelectorBarProps) {
       <Label htmlFor="template-select">Preview template:</Label>
       <Select value={selectedTemplateId} onValueChange={setSelectedTemplateId}>
         <SelectTrigger id="template-select" className="w-48">
-          <SelectValue />
+          <SelectValue>{TEMPLATES[selectedTemplateId]?.label}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {Object.entries(TEMPLATES).map(([id, { label }]) => (
