@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getDb } from '@/lib/db';
+import { getJobSeeker } from '@/lib/job-seeker';
 import { getResumeWithData } from '@/lib/resumes';
 import { getAllSkills } from '@/lib/skills';
 import { generateId } from '@/lib/utils';
@@ -26,6 +27,8 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
   if (!resume) {
     notFound();
   }
+
+  const jobSeeker = getJobSeeker(db);
 
   const initialWorkExperiences: EditorWorkExperience[] = resume.workExperiences.map((we) => {
     const { id, accomplishments, ...data } = we;
@@ -59,6 +62,7 @@ export default async function ResumeEditPage({ params }: ResumeEditPageProps) {
     <main className="h-full">
       <EditResumeEditor
         resume={resume}
+        jobSeeker={jobSeeker}
         initialWorkExperiences={initialWorkExperiences}
         initialSkillSections={initialSkillSections}
         initialEducation={initialEducation}

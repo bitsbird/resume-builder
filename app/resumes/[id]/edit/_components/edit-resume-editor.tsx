@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 
 import { updateResumeWithDataAction } from '@/app/actions';
+import type { JobSeeker } from '@/lib/job-seeker';
 import type { Resume } from '@/lib/resumes';
 import type { Skill } from '@/lib/skills';
 import type { EditorEducation, EditorSkillSection, EditorWorkExperience } from '../../../_components/editor-types';
@@ -13,18 +14,23 @@ import { useResumeEditorForm } from '../../../_components/use-resume-editor-form
 
 interface EditResumeEditorProps {
   resume: Resume;
+  jobSeeker: JobSeeker;
   initialWorkExperiences: EditorWorkExperience[];
   initialSkillSections: EditorSkillSection[];
   initialEducation: EditorEducation[];
   allSkills: Skill[];
 }
 
-export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillSections, initialEducation, allSkills }: EditResumeEditorProps) {
+export function EditResumeEditor({ resume, jobSeeker, initialWorkExperiences, initialSkillSections, initialEducation, allSkills }: EditResumeEditorProps) {
   const router = useRouter();
   const {
     title, setTitle,
     targetRole, setTargetRole,
     targetCompany, setTargetCompany,
+    name, setName,
+    email, setEmail,
+    phone, setPhone,
+    address, setAddress,
     workExperiences, setWorkExperiences,
     skillSections, setSkillSections,
     education, setEducation,
@@ -34,6 +40,10 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
     title: resume.title,
     targetRole: resume.targetRole,
     targetCompany: resume.targetCompany,
+    name: jobSeeker.name,
+    email: jobSeeker.email,
+    phone: jobSeeker.phone,
+    address: jobSeeker.address,
     workExperiences: initialWorkExperiences,
     skillSections: initialSkillSections,
     education: initialEducation,
@@ -46,6 +56,7 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
       title,
       targetRole,
       targetCompany,
+      jobSeeker: { name, email, phone, address },
       workExperiences: toActionInput(workExperiences),
       skillSections: toSkillSectionsActionInput(skillSections),
       education: toEducationActionInput(education),
@@ -68,6 +79,14 @@ export function EditResumeEditor({ resume, initialWorkExperiences, initialSkillS
         onTargetRoleChange={setTargetRole}
         targetCompany={targetCompany}
         onTargetCompanyChange={setTargetCompany}
+        name={name}
+        onNameChange={setName}
+        email={email}
+        onEmailChange={setEmail}
+        phone={phone}
+        onPhoneChange={setPhone}
+        address={address}
+        onAddressChange={setAddress}
         workExperiences={workExperiences}
         onWorkExperiencesChange={setWorkExperiences}
         onAccomplishmentsToDeleteChange={setAccomplishmentsToDelete}

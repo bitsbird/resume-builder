@@ -120,7 +120,12 @@ describe('createResumeWithDataAction', () => {
 });
 
 describe('updateResumeWithDataAction', () => {
-  const baseFields = { title: 'My Resume', targetRole: 'Engineer', targetCompany: 'Acme' };
+  const baseFields = {
+    title: 'My Resume',
+    targetRole: 'Engineer',
+    targetCompany: 'Acme',
+    jobSeeker: { name: '', email: '', phone: '', address: '' },
+  };
 
   async function seedResume() {
     await createResumeWithDataAction({ ...baseFields, workExperiences: [] });
@@ -135,6 +140,7 @@ describe('updateResumeWithDataAction', () => {
       title: 'Updated Resume',
       targetRole: 'Staff Engineer',
       targetCompany: 'Beta Corp',
+      jobSeeker: { name: '', email: '', phone: '', address: '' },
       workExperiences: [],
     });
 
@@ -150,6 +156,7 @@ describe('updateResumeWithDataAction', () => {
       title: '',
       targetRole: 'Engineer',
       targetCompany: 'Acme',
+      jobSeeker: { name: '', email: '', phone: '', address: '' },
       workExperiences: [],
     });
 

@@ -7,7 +7,7 @@ import { SimpleText } from './simple-text';
 import TemplateSection from './template-section';
 import WorkTemplateSection from './work-template-section';
 
-export function DefaultTemplate({ resume }: TemplateProps) {
+export function DefaultTemplate({ resume, jobSeeker }: TemplateProps) {
   return (
     <div className="flex flex-col" style={{ color: resumeDesignTokens.colors.text }}>
       <header
@@ -17,7 +17,7 @@ export function DefaultTemplate({ resume }: TemplateProps) {
         }}
       >
         <ResumeHeading size="lg" style={{ paddingBottom: resumeDesignTokens.spacing[2] }}>
-          James Sommers
+          {jobSeeker.name}
         </ResumeHeading>
         <ResumeHeading size="md">{resume.targetRole}</ResumeHeading>
       </header>
@@ -31,15 +31,15 @@ export function DefaultTemplate({ resume }: TemplateProps) {
           <div>
             <div>
               <SimpleLabel>Email:</SimpleLabel>
-              <SimpleText>James.sommers@gmail.com</SimpleText>
+              <SimpleText>{jobSeeker.email}</SimpleText>
             </div>
             <div>
               <SimpleLabel>Address:</SimpleLabel>
-              <SimpleText>Karl Lieblich Strasse 104, Berlin, Germany</SimpleText>
+              <SimpleText>{jobSeeker.address}</SimpleText>
             </div>
             <div>
               <SimpleLabel>Phone:</SimpleLabel>
-              <SimpleText>+49166641234</SimpleText>
+              <SimpleText>{jobSeeker.phone}</SimpleText>
             </div>
           </div>
         </TemplateSection>

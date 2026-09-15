@@ -1,12 +1,24 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { getJobSeeker } from '@/lib/job-seeker';
 import { getResumeWithData } from '@/lib/resumes';
 import ResumePage from '@/app/resumes/[id]/page';
 
 vi.mock('@/lib/resumes', () => ({
   getResumeWithData: vi.fn(),
 }));
+
+vi.mock('@/lib/job-seeker', () => ({
+  getJobSeeker: vi.fn(),
+}));
+
+const mockJobSeeker = {
+  name: 'James Sommers',
+  email: 'james.sommers@example.com',
+  phone: '+49 160 1234567',
+  address: 'Karl Liebknecht Strasse 104, Berlin, Germany',
+};
 
 const mockResume = {
   id: 1,
@@ -23,6 +35,8 @@ const mockResume = {
 
 beforeEach(() => {
   vi.mocked(getResumeWithData).mockReset();
+  vi.mocked(getJobSeeker).mockReset();
+  vi.mocked(getJobSeeker).mockReturnValue(mockJobSeeker);
 });
 
 describe('/resumes/[id] page', () => {
@@ -31,6 +45,23 @@ describe('/resumes/[id] page', () => {
     render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
     expect(screen.getByText('Senior Engineer CV')).toBeInTheDocument();
     expect(screen.getByText('Staff Engineer')).toBeInTheDocument();
+  });
+
+  it('renders the job seeker contacts', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue(mockResume);
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    const contacts = screen.getByTestId('contacts-section');
+    expect(contacts).toHaveTextContent(mockJobSeeker.name);
+    expect(contacts).toHaveTextContent(mockJobSeeker.email);
+    expect(contacts).toHaveTextContent(mockJobSeeker.phone);
+    expect(contacts).toHaveTextContent(mockJobSeeker.address);
+  });
+
+  it('renders the contacts section with empty values when job seeker contacts are unset', async () => {
+    vi.mocked(getResumeWithData).mockReturnValue(mockResume);
+    vi.mocked(getJobSeeker).mockReturnValue({ name: '', email: '', phone: '', address: '' });
+    render(await ResumePage({ params: Promise.resolve({ id: '1' }) }));
+    expect(screen.getByTestId('contacts-section')).toBeInTheDocument();
   });
 
   it('renders an Edit link pointing to the edit route', async () => {

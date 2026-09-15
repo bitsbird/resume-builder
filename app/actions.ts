@@ -10,6 +10,8 @@ import {
 } from '@/lib/accomplishments';
 import type { Accomplishment } from '@/lib/accomplishments';
 import { getDb } from '@/lib/db';
+import { updateJobSeeker } from '@/lib/job-seeker';
+import type { UpdateJobSeekerInput } from '@/lib/job-seeker';
 import {
   addEducationToResume,
   createEducation,
@@ -175,6 +177,7 @@ export type UpdateResumeWithDataInput = {
   skillSections?: SkillSectionEntry[];
   accomplishmentsToDelete?: number[];
   education?: EducationEntry[];
+  jobSeeker: UpdateJobSeekerInput;
 };
 
 export async function updateResumeWithDataAction(
@@ -185,6 +188,8 @@ export async function updateResumeWithDataAction(
 
   const resumeError = updateResume(db, resumeId, { title, targetRole, targetCompany });
   if (resumeError) return resumeError;
+
+  updateJobSeeker(db, input.jobSeeker);
 
   const existingEntries = workExperiences.filter(
     (we): we is Extract<WorkExperienceEntry, { type: 'existing' }> => we.type === 'existing',

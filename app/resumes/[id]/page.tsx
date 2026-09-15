@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { Label } from '@/components/ui/label';
 import { BaseText, H2, H3, H4, H5 } from '@/components/ui/typography';
 import { getDb } from '@/lib/db';
+import { getJobSeeker } from '@/lib/job-seeker';
 import { getResumeWithData } from '@/lib/resumes';
 
 import { ActionBar } from './_components/action-bar';
@@ -21,11 +22,14 @@ export default async function ResumePage({ params }: ResumPageProps) {
     notFound();
   }
 
-  const resume = getResumeWithData(getDb(), resumeId);
+  const db = getDb();
+  const resume = getResumeWithData(db, resumeId);
 
   if (!resume) {
     notFound();
   }
+
+  const jobSeeker = getJobSeeker(db);
 
   return (
     <div>
@@ -39,6 +43,28 @@ export default async function ResumePage({ params }: ResumPageProps) {
 
       <H3>{resume.targetRole}</H3>
       <H4>{resume.targetCompany}</H4>
+
+      <ResumeSection title="Contacts" testId="contacts-section">
+        <div className="flex flex-col gap-2">
+          <div>
+            <Label className="mr-2">Name:</Label>
+            <BaseText>{jobSeeker.name}</BaseText>
+          </div>
+          <div>
+            <Label className="mr-2">Email:</Label>
+            <BaseText>{jobSeeker.email}</BaseText>
+          </div>
+          <div>
+            <Label className="mr-2">Phone:</Label>
+            <BaseText>{jobSeeker.phone}</BaseText>
+          </div>
+          <div>
+            <Label className="mr-2">Address:</Label>
+            <BaseText>{jobSeeker.address}</BaseText>
+          </div>
+        </div>
+      </ResumeSection>
+
       {resume.skillSections.filter((s) => s.skills.length > 0).length > 0 && (
         <ResumeSection title="Skills">
           <div className="flex flex-col gap-4">

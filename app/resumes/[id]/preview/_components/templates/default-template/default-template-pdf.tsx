@@ -128,26 +128,24 @@ function WorkExperienceEntry({ workExperience }: WorkExperienceEntryProps) {
   );
 }
 
-export function DefaultTemplatePdf({ resume }: TemplateProps) {
+export function DefaultTemplatePdf({ resume, jobSeeker }: TemplateProps) {
   return (
     <Document>
       <Page size="LETTER" style={styles.page}>
         <View style={styles.header}>
-          {/* TODO: remove once real data is wired up */}
-          <Text style={styles.name}>James Sommers</Text>
+          <Text style={styles.name}>{jobSeeker.name}</Text>
           <Text style={styles.targetRole}>{resume.targetRole}</Text>
         </View>
         <View style={styles.main}>
           <TemplateSectionPdf title="Contacts">
-            {/* TODO: remove once real data is wired up */}
             <View>
-              <Text style={styles.label}>Email: James.sommers@gmail.com</Text>
+              <Text style={styles.label}>Email: {jobSeeker.email}</Text>
             </View>
             <View>
-              <Text style={styles.label}>Address: Karl Lieblich Strasse 104, Berlin, Germany</Text>
+              <Text style={styles.label}>Address: {jobSeeker.address}</Text>
             </View>
             <View>
-              <Text style={styles.label}>Phone: +49166641234</Text>
+              <Text style={styles.label}>Phone: {jobSeeker.phone}</Text>
             </View>
           </TemplateSectionPdf>
           <TemplateSectionPdf title="Profile">

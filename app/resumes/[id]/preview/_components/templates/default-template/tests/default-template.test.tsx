@@ -2,7 +2,17 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { DefaultTemplate } from '@/app/resumes/[id]/preview/_components/templates/default-template/default-template';
+import type { JobSeeker } from '@/lib/job-seeker';
 import type { ResumeWithData } from '@/lib/resumes';
+
+const fullJobSeeker: JobSeeker = {
+  name: 'James Sommers',
+  email: 'james.sommers@example.com',
+  phone: '+49 160 1234567',
+  address: 'Karl Liebknecht Strasse 104, Berlin, Germany',
+};
+
+const minimalJobSeeker: JobSeeker = { name: '', email: '', phone: '', address: '' };
 
 const fullResume: ResumeWithData = {
   id: 1,
@@ -57,8 +67,12 @@ const minimalResume: ResumeWithData = {
 
 describe('DefaultTemplate', () => {
   it('renders target role, profile summary, skills, work experience, and education', () => {
-    render(<DefaultTemplate resume={fullResume} />);
+    render(<DefaultTemplate resume={fullResume} jobSeeker={fullJobSeeker} />);
 
+    expect(screen.getByText(fullJobSeeker.name)).toBeInTheDocument();
+    expect(screen.getByText(fullJobSeeker.email)).toBeInTheDocument();
+    expect(screen.getByText(fullJobSeeker.phone)).toBeInTheDocument();
+    expect(screen.getByText(fullJobSeeker.address)).toBeInTheDocument();
     expect(screen.getByText('Staff Software Engineer')).toBeInTheDocument();
     const hasProfileSummary = (element: Element | null) =>
       element?.textContent?.startsWith(fullResume.profileSummary) ?? false;
@@ -86,7 +100,7 @@ describe('DefaultTemplate', () => {
   });
 
   it('renders section labels with no content when resume data is empty', () => {
-    render(<DefaultTemplate resume={minimalResume} />);
+    render(<DefaultTemplate resume={minimalResume} jobSeeker={minimalJobSeeker} />);
 
     expect(screen.getByText('Contacts')).toBeInTheDocument();
     expect(screen.getByText('Profile')).toBeInTheDocument();

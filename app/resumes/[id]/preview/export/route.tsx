@@ -2,6 +2,7 @@ import { renderToBuffer } from '@react-pdf/renderer';
 import type { NextRequest } from 'next/server';
 
 import { getDb } from '@/lib/db';
+import { getJobSeeker } from '@/lib/job-seeker';
 import { getResumeWithData } from '@/lib/resumes';
 import { defaultTemplateId, TEMPLATES } from '@/lib/templates';
 
@@ -25,13 +26,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return new Response('Not Found', { status: 404 });
   }
 
-  const resume = getResumeWithData(getDb(), resumeId);
+  const db = getDb();
+  const resume = getResumeWithData(db, resumeId);
   if (!resume) {
     return new Response('Not Found', { status: 404 });
   }
+  const jobSeeker = getJobSeeker(db);
 
   const PdfTemplate = await template.loadPdf();
-  const buffer = await renderToBuffer(<PdfTemplate resume={resume} />);
+  const buffer = await renderToBuffer(<PdfTemplate resume={resume} jobSeeker={jobSeeker} />);
 
   const filename = resume.title.replace(/"/g, '') || 'resume';
 

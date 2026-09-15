@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getDb } from '@/lib/db';
+import { getJobSeeker } from '@/lib/job-seeker';
 import { getResumeWithData } from '@/lib/resumes';
 import { TEMPLATES, defaultTemplateId } from '@/lib/templates';
 
@@ -21,15 +22,17 @@ export default async function PreviewPage({ params, searchParams }: PreviewPageP
   const template = TEMPLATES[templateId];
   if (!template) notFound();
 
-  const resume = getResumeWithData(getDb(), resumeId);
+  const db = getDb();
+  const resume = getResumeWithData(db, resumeId);
   if (!resume) notFound();
+  const jobSeeker = getJobSeeker(db);
 
   const TemplateComponent = await template.load();
 
   return (
     <div>
       <PreviewHeader templateLabel={template.label} resumeId={resumeId} templateId={templateId} />
-      <TemplateComponent resume={resume} />
+      <TemplateComponent resume={resume} jobSeeker={jobSeeker} />
     </div>
   );
 }

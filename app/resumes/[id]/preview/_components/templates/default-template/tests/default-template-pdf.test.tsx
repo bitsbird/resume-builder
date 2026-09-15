@@ -3,11 +3,21 @@ import { PDFParse } from 'pdf-parse';
 import { describe, expect, it } from 'vitest';
 
 import { DefaultTemplatePdf } from '@/app/resumes/[id]/preview/_components/templates/default-template/default-template-pdf';
+import type { JobSeeker } from '@/lib/job-seeker';
 import type { ResumeWithData } from '@/lib/resumes';
 
 function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
+
+const fullJobSeeker: JobSeeker = {
+  name: 'James Sommers',
+  email: 'james.sommers@example.com',
+  phone: '+49 160 1234567',
+  address: 'Karl Liebknecht Strasse 104, Berlin, Germany',
+};
+
+const minimalJobSeeker: JobSeeker = { name: '', email: '', phone: '', address: '' };
 
 const longProfileSummary =
   'Building reliable backend systems for five years. This software engineering background bridges computer science foundations with practical industry skills, spanning data structures, algorithms, and object oriented programming in Python and Java. The full stack experience covers scalable web applications with React, Node.js, and PostgreSQL. DevOps work includes Docker containerization, CI CD pipelines, and AWS cloud management. Advanced projects explore distributed systems, microservices, and workflows like Agile and Git, culminating in a distributed system capstone that combined technical depth with collaborative delivery across modern engineering teams.';
@@ -63,19 +73,25 @@ const minimalResume: ResumeWithData = {
   education: [],
 };
 
-async function extractPdfText(resume: ResumeWithData): Promise<string> {
-  const buffer = await renderToBuffer(<DefaultTemplatePdf resume={resume} />);
+async function extractPdfText(
+  resume: ResumeWithData,
+  jobSeeker: JobSeeker = fullJobSeeker,
+): Promise<string> {
+  const buffer = await renderToBuffer(<DefaultTemplatePdf resume={resume} jobSeeker={jobSeeker} />);
   const parser = new PDFParse({ data: buffer });
   const { text } = await parser.getText();
   return normalizeWhitespace(text);
 }
 
 describe('DefaultTemplatePdf', () => {
-  it('renders the contacts section', async () => {
+  it('renders the job seeker name and contacts', async () => {
     const text = await extractPdfText(fullResume);
 
+    expect(text).toContain(fullJobSeeker.name);
     expect(text).toContain('Contacts');
-    expect(text).toContain('James.sommers@gmail.com');
+    expect(text).toContain(fullJobSeeker.email);
+    expect(text).toContain(fullJobSeeker.address);
+    expect(text).toContain(fullJobSeeker.phone);
   });
 
   it('renders the profile section with the resume profile summary', async () => {
@@ -129,7 +145,7 @@ describe('DefaultTemplatePdf', () => {
   });
 
   it('renders section titles with no stray content for a boundary resume with no skills, no education, and no work experience', async () => {
-    const text = await extractPdfText(minimalResume);
+    const text = await extractPdfText(minimalResume, minimalJobSeeker);
 
     expect(text).toContain('Contacts');
     expect(text).toContain('Profile');
@@ -143,10 +159,10 @@ describe('DefaultTemplatePdf', () => {
   });
 
   it.each([
-    ['a fully-populated resume', fullResume],
-    ['a boundary resume', minimalResume],
-  ])('produces a valid, non-empty PDF buffer for %s', async (_label, resume) => {
-    const buffer = await renderToBuffer(<DefaultTemplatePdf resume={resume} />);
+    ['a fully-populated resume', fullResume, fullJobSeeker],
+    ['a boundary resume', minimalResume, minimalJobSeeker],
+  ])('produces a valid, non-empty PDF buffer for %s', async (_label, resume, jobSeeker) => {
+    const buffer = await renderToBuffer(<DefaultTemplatePdf resume={resume} jobSeeker={jobSeeker} />);
 
     expect(buffer.length).toBeGreaterThan(0);
     expect(buffer.toString('latin1', 0, 5)).toBe('%PDF-');

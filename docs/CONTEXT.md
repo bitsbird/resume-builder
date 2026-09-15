@@ -15,6 +15,10 @@ A professional resume is a concise, structured document highlighting a job seeke
 
 A single job seeker owns the application. There is no authentication or multi-user support. The job seeker's career data (Skills, Work Experiences, Accomplishments, Education) forms a shared repository that resumes compose from. All data entry happens through the resume interface — there is no standalone repository management screen.
 
+The job seeker also has contact info — their name and how to reach them — used to render every resume's header and Contacts section, identical across all resumes since there's only one job seeker.
+
+**Fields:** `name`, `email`, `phone`, `address` (single row, edited from within the resume editor alongside the resume being worked on)
+
 # Skill
 
 A skill is a concise keyword (1–2 words max) summing up a high-level, professionally relevant ability in a widely recognizable format for rapid scanning. Skills are shared entities belonging to the job seeker with no inherent category. They are organized into Skill Sections at the resume level.

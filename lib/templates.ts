@@ -1,7 +1,9 @@
+import type { JobSeeker } from './job-seeker';
 import type { ResumeWithData } from './resumes';
 
 export interface TemplateProps {
   resume: ResumeWithData;
+  jobSeeker: JobSeeker;
 }
 
 export type TemplateComponent = React.ComponentType<TemplateProps>;

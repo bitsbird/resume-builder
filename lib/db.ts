@@ -78,6 +78,15 @@ export function initDb(dbPath: string): Database.Database {
       edu_id    INTEGER NOT NULL REFERENCES educations(id),
       PRIMARY KEY (resume_id, edu_id)
     );
+
+    CREATE TABLE IF NOT EXISTS job_seeker (
+      id      INTEGER PRIMARY KEY CHECK (id = 1),
+      name    TEXT NOT NULL DEFAULT '',
+      email   TEXT NOT NULL DEFAULT '',
+      phone   TEXT NOT NULL DEFAULT '',
+      address TEXT NOT NULL DEFAULT ''
+    );
+    INSERT OR IGNORE INTO job_seeker (id) VALUES (1);
   `);
   return db;
 }

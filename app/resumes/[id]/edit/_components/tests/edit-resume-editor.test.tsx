@@ -50,6 +50,13 @@ const mockResume = {
   profileSummary: 'Experienced engineer.',
 };
 
+const mockJobSeeker = {
+  name: 'James Sommers',
+  email: 'james.sommers@example.com',
+  phone: '+49 160 1234567',
+  address: 'Karl Liebknecht Strasse 104, Berlin, Germany',
+};
+
 const newWorkExperience: EditorWorkExperience = {
   type: 'new',
   localId: 'local-1',
@@ -89,6 +96,7 @@ describe('EditResumeEditor', () => {
     render(
       <EditResumeEditor
         resume={mockResume}
+        jobSeeker={mockJobSeeker}
         initialWorkExperiences={[newWorkExperience]}
         initialSkillSections={[]}
         initialEducation={[]}
@@ -113,6 +121,7 @@ describe('EditResumeEditor', () => {
       title: 'Updated CV',
       targetRole: 'Principal Engineer',
       targetCompany: 'Globex Corp',
+      jobSeeker: mockJobSeeker,
       workExperiences: [{ type: 'new', data: newWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
       skillSections: [],
@@ -122,7 +131,7 @@ describe('EditResumeEditor', () => {
 
   it('calls updateResumeWithDataAction with initial values when save is clicked without changes', async () => {
     render(
-      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
+      <EditResumeEditor resume={mockResume} jobSeeker={mockJobSeeker} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
     );
 
     fireEvent.click(screen.getByTestId('edit-resume-save'));
@@ -132,6 +141,7 @@ describe('EditResumeEditor', () => {
       title: mockResume.title,
       targetRole: mockResume.targetRole,
       targetCompany: mockResume.targetCompany,
+      jobSeeker: mockJobSeeker,
       workExperiences: [],
       accomplishmentsToDelete: [],
       skillSections: [],
@@ -154,7 +164,7 @@ describe('EditResumeEditor', () => {
       accomplishments: [],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
+    render(<EditResumeEditor resume={mockResume} jobSeeker={mockJobSeeker} initialWorkExperiences={[existingWorkExperience]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
 
     act(() => capturedWeOnChange!([modifiedWorkExperience]));
 
@@ -165,6 +175,7 @@ describe('EditResumeEditor', () => {
       title: mockResume.title,
       targetRole: mockResume.targetRole,
       targetCompany: mockResume.targetCompany,
+      jobSeeker: mockJobSeeker,
       workExperiences: [{ type: 'new', data: modifiedWorkExperience.data, accomplishments: [] }],
       accomplishmentsToDelete: [],
       skillSections: [],
@@ -180,7 +191,7 @@ describe('EditResumeEditor', () => {
       skills: [{ type: 'new', localId: 'skill-1', name: 'React' }],
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
+    render(<EditResumeEditor resume={mockResume} jobSeeker={mockJobSeeker} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
 
     act(() => capturedSkillOnChange!([newSection]));
 
@@ -202,7 +213,7 @@ describe('EditResumeEditor', () => {
       data: { degree: 'BSc CS', institution: 'MIT', startDate: '2015-09', endDate: '2019-06' },
     };
 
-    render(<EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
+    render(<EditResumeEditor resume={mockResume} jobSeeker={mockJobSeeker} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />);
 
     act(() => capturedEduOnChange!([newEdu]));
 
@@ -217,7 +228,7 @@ describe('EditResumeEditor', () => {
 
   it('cancel button navigates to resume view page without saving', () => {
     render(
-      <EditResumeEditor resume={mockResume} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
+      <EditResumeEditor resume={mockResume} jobSeeker={mockJobSeeker} initialWorkExperiences={[]} initialSkillSections={[]} initialEducation={[]} allSkills={[]} />,
     );
 
     fireEvent.click(screen.getByTestId('edit-resume-cancel'));
